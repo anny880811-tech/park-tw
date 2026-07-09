@@ -1,0 +1,9 @@
+.app-shell {
+  min-height: 100vh;
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.app-shell h1 {
+  font-weight: 700;
+}
