@@ -1,11 +1,17 @@
+import { Link, NavLink } from 'react-router-dom'
+
+const navLinkClassName = ({ isActive }) => {
+  return ['nav-link', isActive ? 'active' : ''].filter(Boolean).join(' ')
+}
+
 const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-md site-navbar">
       <div className="container">
-        <a className="navbar-brand brand-logo" href="#" aria-label="停哪裡首頁">
+        <Link className="navbar-brand brand-logo" to="/" aria-label="停哪裡首頁">
           <span className="brand-logo__mark">停</span>
           <span className="brand-logo__name">停哪裡</span>
-        </a>
+        </Link>
 
         <button
           className="navbar-toggler"
@@ -22,19 +28,19 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="siteNavbar">
           <ul className="navbar-nav ms-md-auto mt-3 mt-md-0 gap-md-2">
             <li className="nav-item">
-              <a className="nav-link" href="#">
+              <NavLink className={navLinkClassName} to="/">
                 首頁
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
+              <NavLink className={navLinkClassName} to="/parking">
                 停車場
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
+              <NavLink className={navLinkClassName} to="/about">
                 關於
-              </a>
+              </NavLink>
             </li>
           </ul>
         </div>

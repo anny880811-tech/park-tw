@@ -429,6 +429,25 @@ small,
   padding: 0.5rem 0;
 }
 
+.about-page {
+  padding: 4rem 0;
+}
+
+.about-page__content {
+  display: grid;
+  max-width: 42rem;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--color-surface);
+  border: 1px solid rgba(91, 124, 153, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.about-page__content h1 {
+  margin-bottom: 0;
+}
+
 .navbar {
   min-height: 4.5rem;
   border-bottom: 1px solid rgba(91, 124, 153, 0.1);
@@ -513,7 +532,8 @@ small,
 }
 
 .site-navbar .nav-link:hover,
-.site-navbar .nav-link:focus {
+.site-navbar .nav-link:focus,
+.site-navbar .nav-link.active {
   background: rgba(167, 213, 217, 0.24);
   color: var(--color-text);
 }
