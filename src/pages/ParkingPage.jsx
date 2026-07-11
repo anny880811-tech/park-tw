@@ -1,33 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ParkingInfoCard from '../components/parking/ParkingInfoCard.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
-import { parkingLots } from '../data/mockParkingData.js'
-
-const filterParkingLots = (items, keyword) => {
-  const normalizedKeyword = keyword.trim().toLowerCase()
-
-  if (!normalizedKeyword) {
-    return items
-  }
-
-  return items.filter((item) => {
-    const searchableText = [
-      item.name,
-      item.address,
-      item.district,
-    ].join(' ').toLowerCase()
-
-    return searchableText.includes(normalizedKeyword)
-  })
-}
+import { searchParkingLots } from '../services/parkingService.js'
 
 const ParkingPage = () => {
   const [keyword, setKeyword] = useState('')
-  const filteredParkingLots = filterParkingLots(parkingLots, keyword)
+  const [filteredParkingLots, setFilteredParkingLots] = useState([])
   const hasResults = filteredParkingLots.length > 0
+
+  useEffect(() => {
+    let isActive = true
+
+    const loadParkingLots = async () => {
+      const result = await searchParkingLots({ keyword })
+
+      if (isActive) {
+        setFilteredParkingLots(result.parkingLots)
+      }
+    }
+
+    loadParkingLots()
+
+    return () => {
+      isActive = false
+    }
+  }, [keyword])
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
@@ -73,7 +73,7 @@ const ParkingPage = () => {
             />
             <div className="parking-search-panel__meta">
               <span>
-                顯示 {filteredParkingLots.length} / {parkingLots.length} 筆停車場
+                顯示 {filteredParkingLots.length} 筆停車場
               </span>
               {keyword && (
                 <Button

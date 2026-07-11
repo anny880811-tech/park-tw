@@ -1,46 +1,14 @@
-import { useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import NearbyParkingSection from '../components/parking/NearbyParkingSection.jsx'
 import LocationStatus from '../components/location/LocationStatus.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
-import {
-  calculateDistanceInMeters,
-  formatDistance,
-} from '../utils/distance.js'
-import {
-  nearbyParkingLots,
-  nearbyStreetParkingSpaces,
-} from '../data/mockParkingData.js'
-
-const sortItemsByPosition = (items, position) => {
-  if (!position) {
-    return items
-  }
-
-  return items
-    .map((item) => {
-      const distanceInMeters = calculateDistanceInMeters(position, item)
-
-      if (distanceInMeters === null) {
-        return item
-      }
-
-      return {
-        ...item,
-        distanceInMeters,
-        displayDistance: formatDistance(distanceInMeters),
-      }
-    })
-    .sort((firstItem, secondItem) => {
-      const firstDistance = firstItem.distanceInMeters ?? Number.POSITIVE_INFINITY
-      const secondDistance = secondItem.distanceInMeters ?? Number.POSITIVE_INFINITY
-
-      return firstDistance - secondDistance
-    })
-}
+import { getNearbyParking } from '../services/parkingService.js'
 
 const HomePage = () => {
+  const [parkingLots, setParkingLots] = useState([])
+  const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
   const {
     status,
     position,
@@ -49,17 +17,30 @@ const HomePage = () => {
   } = useGeolocation()
   const isLoading = status === 'loading'
   const canSortByPosition = status === 'success' && position
-  const parkingLots = useMemo(() => {
-    return sortItemsByPosition(
-      nearbyParkingLots,
-      canSortByPosition ? position : null,
-    )
-  }, [canSortByPosition, position])
-  const streetParkingSpaces = useMemo(() => {
-    return sortItemsByPosition(
-      nearbyStreetParkingSpaces,
-      canSortByPosition ? position : null,
-    )
+
+  useEffect(() => {
+    let isActive = true
+
+    const loadNearbyParking = async () => {
+      const locationParams = canSortByPosition
+        ? {
+            latitude: position.latitude,
+            longitude: position.longitude,
+          }
+        : undefined
+      const result = await getNearbyParking(locationParams)
+
+      if (isActive) {
+        setParkingLots(result.parkingLots)
+        setStreetParkingSpaces(result.streetParkingSpaces)
+      }
+    }
+
+    loadNearbyParking()
+
+    return () => {
+      isActive = false
+    }
   }, [canSortByPosition, position])
 
   return (
