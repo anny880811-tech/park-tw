@@ -294,6 +294,49 @@ small,
   padding-top: 2rem;
 }
 
+.location-status__content {
+  display: grid;
+  gap: 1rem;
+}
+
+.location-status__content h2 {
+  margin-bottom: 0.35rem;
+}
+
+.location-status__content p {
+  color: var(--color-text-secondary);
+}
+
+.location-status__position {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0;
+  padding: 1rem;
+  background: rgba(167, 213, 217, 0.16);
+  border-radius: var(--radius-md);
+}
+
+.location-status__position div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.location-status__position dt {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.location-status__position dd {
+  margin-bottom: 0;
+  color: var(--color-text);
+  font-family: var(--bs-font-monospace);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
 .mock-data-notice {
   display: flex;
   flex-wrap: wrap;
@@ -578,6 +621,15 @@ small,
 
   .home-hero__button {
     width: 100%;
+  }
+
+  .location-status__position div {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .location-status__position dd {
+    text-align: left;
   }
 
   .parking-page__header {
