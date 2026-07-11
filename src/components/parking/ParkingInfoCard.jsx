@@ -1,13 +1,6 @@
 import Badge from '../ui/Badge.jsx'
 import Card from '../ui/Card.jsx'
-
-const formatDistance = (distance) => {
-  if (distance >= 1000) {
-    return `${(distance / 1000).toFixed(1)} 公里`
-  }
-
-  return `${distance} 公尺`
-}
+import { formatDistance } from '../../utils/distance.js'
 
 const ParkingInfoCard = ({ item }) => {
   const {
@@ -17,6 +10,7 @@ const ParkingInfoCard = ({ item }) => {
     address,
     road,
     distance,
+    displayDistance,
     totalSpaces,
     availableSpaces,
     price,
@@ -26,6 +20,7 @@ const ParkingInfoCard = ({ item }) => {
   const hasSpaces = availableSpaces > 0
   const locationText = address || road
   const openStatus = isOpen === false ? '未營業' : '營業中'
+  const distanceText = displayDistance || formatDistance(distance)
 
   return (
     <Card className="parking-card" subtitle={locationText} title={name}>
@@ -56,7 +51,7 @@ const ParkingInfoCard = ({ item }) => {
         </div>
         <div>
           <dt>距離</dt>
-          <dd>{formatDistance(distance)}</dd>
+          <dd>{distanceText}</dd>
         </div>
         <div>
           <dt>剩餘車位</dt>

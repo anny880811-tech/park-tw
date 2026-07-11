@@ -1,12 +1,44 @@
+import { useMemo } from 'react'
 import NearbyParkingSection from '../components/parking/NearbyParkingSection.jsx'
 import LocationStatus from '../components/location/LocationStatus.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
 import {
+  calculateDistanceInMeters,
+  formatDistance,
+} from '../utils/distance.js'
+import {
   nearbyParkingLots,
   nearbyStreetParkingSpaces,
 } from '../data/mockParkingData.js'
+
+const sortItemsByPosition = (items, position) => {
+  if (!position) {
+    return items
+  }
+
+  return items
+    .map((item) => {
+      const distanceInMeters = calculateDistanceInMeters(position, item)
+
+      if (distanceInMeters === null) {
+        return item
+      }
+
+      return {
+        ...item,
+        distanceInMeters,
+        displayDistance: formatDistance(distanceInMeters),
+      }
+    })
+    .sort((firstItem, secondItem) => {
+      const firstDistance = firstItem.distanceInMeters ?? Number.POSITIVE_INFINITY
+      const secondDistance = secondItem.distanceInMeters ?? Number.POSITIVE_INFINITY
+
+      return firstDistance - secondDistance
+    })
+}
 
 const HomePage = () => {
   const {
@@ -16,6 +48,19 @@ const HomePage = () => {
     getCurrentLocation,
   } = useGeolocation()
   const isLoading = status === 'loading'
+  const canSortByPosition = status === 'success' && position
+  const parkingLots = useMemo(() => {
+    return sortItemsByPosition(
+      nearbyParkingLots,
+      canSortByPosition ? position : null,
+    )
+  }, [canSortByPosition, position])
+  const streetParkingSpaces = useMemo(() => {
+    return sortItemsByPosition(
+      nearbyStreetParkingSpaces,
+      canSortByPosition ? position : null,
+    )
+  }, [canSortByPosition, position])
 
   return (
     <div className="home-page">
@@ -57,13 +102,13 @@ const HomePage = () => {
 
         <NearbyParkingSection
           description="顯示目前位置附近的路外停車場、剩餘車位與收費資訊。"
-          items={nearbyParkingLots}
+          items={parkingLots}
           title="附近停車場"
         />
 
         <NearbyParkingSection
           description="顯示目前位置附近的路邊停車格與可用格位。"
-          items={nearbyStreetParkingSpaces}
+          items={streetParkingSpaces}
           title="附近路邊停車格"
         />
       </section>
