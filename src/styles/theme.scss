@@ -1,0 +1,212 @@
+:root {
+  --color-primary: #A7D5D9;
+  --color-primary-hover: #7FC3CA;
+  --color-secondary: #5B7C99;
+  --color-success: #52B788;
+  --color-warning: #F4A261;
+  --color-danger: #E76F51;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-text: #2F3E46;
+  --color-text-secondary: #6C757D;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 8px 20px rgba(47, 62, 70, 0.06);
+  --shadow-md: 0 16px 36px rgba(47, 62, 70, 0.08);
+  --shadow-lg: 0 24px 60px rgba(47, 62, 70, 0.12);
+}
+
+body {
+  font-family: var(--bs-body-font-family);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(2rem, 1.6rem + 1.5vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 1.25rem + 0.8vw, 2.125rem);
+}
+
+h3 {
+  font-size: clamp(1.2rem, 1.05rem + 0.4vw, 1.5rem);
+  font-weight: 600;
+}
+
+p {
+  color: var(--color-text);
+}
+
+small,
+.small {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.fw-medium {
+  font-weight: 500;
+}
+
+.btn {
+  --bs-btn-border-radius: var(--radius-md);
+  --bs-btn-font-weight: 600;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.1rem;
+  border-width: 1px;
+  box-shadow: none;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--color-primary);
+  --bs-btn-border-color: var(--color-primary);
+  --bs-btn-color: var(--color-text);
+  --bs-btn-hover-bg: var(--color-primary-hover);
+  --bs-btn-hover-border-color: var(--color-primary-hover);
+  --bs-btn-hover-color: var(--color-text);
+  --bs-btn-active-bg: var(--color-primary-hover);
+  --bs-btn-active-border-color: var(--color-primary-hover);
+  --bs-btn-active-color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+  --bs-btn-bg: var(--color-secondary);
+  --bs-btn-border-color: var(--color-secondary);
+  --bs-btn-color: #FFFFFF;
+  --bs-btn-hover-bg: #4f6f8a;
+  --bs-btn-hover-border-color: #4f6f8a;
+  --bs-btn-hover-color: #FFFFFF;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--color-secondary);
+  --bs-btn-border-color: rgba(91, 124, 153, 0.32);
+  --bs-btn-hover-bg: rgba(167, 213, 217, 0.28);
+  --bs-btn-hover-border-color: var(--color-primary-hover);
+  --bs-btn-hover-color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.card {
+  --bs-card-border-color: rgba(91, 124, 153, 0.12);
+  --bs-card-border-radius: var(--radius-lg);
+  --bs-card-bg: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-md);
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.badge {
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.45rem 0.7rem;
+}
+
+.text-bg-primary {
+  background-color: var(--color-primary) !important;
+  color: var(--color-text) !important;
+}
+
+.text-bg-secondary {
+  background-color: rgba(91, 124, 153, 0.12) !important;
+  color: var(--color-secondary) !important;
+}
+
+.text-bg-success {
+  background-color: rgba(82, 183, 136, 0.16) !important;
+  color: #28724f !important;
+}
+
+.text-bg-warning {
+  background-color: rgba(244, 162, 97, 0.18) !important;
+  color: #91602f !important;
+}
+
+.text-bg-danger {
+  background-color: rgba(231, 111, 81, 0.16) !important;
+  color: #9b3d28 !important;
+}
+
+.form-label {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.form-control {
+  min-height: 3rem;
+  border-color: rgba(91, 124, 153, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+  border-color: var(--color-primary-hover);
+  box-shadow: 0 0 0 0.2rem rgba(127, 195, 202, 0.2);
+}
+
+.navbar {
+  min-height: 4.5rem;
+  border-bottom: 1px solid rgba(91, 124, 153, 0.1);
+  box-shadow: var(--shadow-sm);
+}
+
+.container {
+  width: min(100% - 2rem, 1120px);
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.brand-logo:hover {
+  color: var(--color-text);
+}
+
+.brand-logo__mark {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-logo__name,
+.brand-logo__subname {
+  display: block;
+  line-height: 1.1;
+}
+
+.brand-logo__name {
+  font-size: 1.05rem;
+}
+
+.brand-logo__subname {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
