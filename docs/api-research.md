@@ -1,0 +1,212 @@
+# 全台灣停車資料 API 研究
+
+## 1. 研究目的
+
+本文件整理「停哪裡」後續從 mock data 轉向真實停車資料時的資料來源、授權風險、欄位設計與轉換策略。
+
+目前專案已完成：
+
+- HomePage：使用瀏覽器 Geolocation API 取得使用者位置，並用 mock data 顯示附近停車場與路邊停車格。
+- ParkingPage：使用 SearchBar 搜尋 mock data 停車場。
+- 距離工具：可依使用者座標計算 mock data 距離並排序。
+
+本階段不實作 API request，只先定義後續串接全台灣資料時的方向。
+
+## 2. 專案資料範圍
+
+- 本專案目標為全台灣停車資訊。
+- 不針對單一縣市寫死資料格式。
+- 資料模型需可支援台北市、新北市、桃園市、台中市、台南市、高雄市與其他縣市。
+- HomePage 未來應使用使用者座標查詢附近停車資訊。
+- ParkingPage 未來應使用統一格式資料做關鍵字搜尋。
+
+## 3. 候選資料來源
+
+候選資料來源分為兩層：
+
+1. TDX 運輸資料流通服務：作為全台灣交通資料的主要研究來源。
+2. 各縣市 Open Data：作為 TDX 資料不足、欄位不完整或特定縣市即時資料缺漏時的補充來源。
+
+政府資料開放平臺提供資料集搜尋、API 服務資料集、授權條款與 M2M 專區等入口，適合作為地方政府資料集盤點來源之一。
+
+參考：
+
+- TDX API Swagger：https://tdx.transportdata.tw/api-service/swagger
+- 政府資料開放平臺：https://data.gov.tw/
+
+## 4. TDX 停車資訊 API
+
+初步結論：
+
+- TDX 應作為本專案全台灣停車資料的主要來源。
+- TDX 官方 API 文件頁面可連線，但目前此研究環境無法從 JavaScript Swagger 頁面可靠抽取完整 API schema。
+- TDX 停車 API 的精確 endpoint、欄位名稱、城市代碼、路邊停車支援範圍、OData 支援細節，需要下一階段人工對照官方 Swagger 或匯出 OpenAPI schema。
+
+本階段可先確認的設計方向：
+
+- 應假設 TDX 可能提供路外停車場基本資料與即時剩餘車位資料。
+- 應假設不同資料集可能拆成「靜態基本資料」與「即時可用車位」兩類。
+- 應支援依縣市查詢，避免一次拉全台所有資料造成前端負擔。
+- 應設計 OData query 的介面層，但實際可用參數需以官方文件確認。
+- 經緯度、地址、收費、營業時間、總車位、剩餘車位、更新時間等欄位不可假設一定存在，adapter 需容錯。
+
+待確認：
+
+- TDX 是否提供全台灣路外停車場完整清單。
+- TDX 是否提供全台灣路外停車場即時剩餘車位。
+- TDX 是否提供路邊停車格或路邊停車路段資料。
+- TDX 是否支援依縣市查詢停車資料。
+- TDX 是否支援 `$filter`、`$select`、`$top`、`$skip` 等 OData query。
+- TDX 停車資料是否穩定包含經緯度、收費、營業時間與更新時間。
+- TDX API 的實際 rate limit、快取建議與錯誤格式。
+
+## 5. 各縣市 Open Data 作為補充來源
+
+各縣市政府可能提供自己的停車資料，例如：
+
+- 路外停車場基本資料。
+- 公有停車場即時剩餘車位。
+- 路邊停車格或路段資訊。
+- 停車費率與營業時間。
+
+但地方 Open Data 的風險較高：
+
+- 欄位格式可能不一致。
+- 更新頻率可能不同。
+- 有些縣市只有路外停車場資料。
+- 有些縣市可能有路邊停車格資料，但不一定有即時狀態。
+- 有些資料可能沒有經緯度。
+- 有些資料可能需要地址轉座標、欄位清理或狀態轉換。
+
+策略上不應讓畫面直接依賴各縣市原始欄位，而應建立 adapter，把不同來源轉為專案內部統一格式。
+
+## 6. 路外停車場資料欄位整理
+
+路外停車場最少需要支援：
+
+- 停車場 ID
+- 停車場名稱
+- 城市
+- 縣市代碼
+- 行政區
+- 地址
+- 經緯度
+- 總車位
+- 剩餘車位
+- 汽車位
+- 機車位
+- 收費方式
+- 營業狀態
+- 資料來源
+- 更新時間
+
+TDX 或地方資料可能會將基本資料與即時車位拆在不同 response，因此後續 service layer 需要支援 merge。
+
+## 7. 路邊停車格資料欄位整理
+
+路邊停車格或路段資料最少需要支援：
+
+- ID
+- 名稱
+- 城市
+- 縣市代碼
+- 行政區
+- 路段名稱
+- 路段編號
+- 車格編號
+- 車格種類
+- 經緯度
+- 剩餘格位或占用狀態
+- 收費方式
+- 資料來源
+- 更新時間
+
+路邊停車資料通常比路外停車場更不一致，有些來源可能只提供路段可用格數，不提供單一車格座標。
+
+## 8. API 授權與安全注意事項
+
+TDX API 授權方式需以官方文件確認。由於需求提到 Client Id / Client Secret，本專案設計上應先假設：
+
+- 不可把 Client Secret 放在 React 前端。
+- 不可建立 `.env` 儲存正式密鑰並送進前端 bundle。
+- 若 TDX 需要 OAuth token 或 client credential flow，應由後端或 serverless proxy 取得 token。
+- 前端只呼叫本專案自己的 API endpoint 或 serverless function。
+- 若未來有公開免授權 endpoint，也仍應確認 rate limit 與 CORS 策略。
+
+待確認：
+
+- TDX 是否必須登入會員取得 Client Id / Client Secret。
+- TDX token 有效期限與更新方式。
+- TDX 是否允許純前端直接呼叫。
+- TDX CORS 與流量限制。
+
+## 9. 前端是否能直接串接
+
+初步建議：正式產品不建議直接從 React 前端呼叫需要 Client Secret 的 TDX API。
+
+原因：
+
+- React 前端無法安全保存 secret。
+- token 交換流程若需要 secret，必須放在 server side。
+- 直接呼叫外部 API 會讓畫面耦合外部欄位、錯誤格式與 rate limit。
+
+可行方向：
+
+- 開發初期可用 mock data 或本地 fixture。
+- 串接階段建立 service layer。
+- 若 TDX 需要 secret，使用後端或 serverless proxy。
+- 前端只接收已 normalize 的內部格式資料。
+
+## 10. 建議的全台灣串接策略
+
+第一步：以 TDX 停車資訊 API 作為主要資料來源。
+
+第二步：建立 service layer，讓前端不要直接依賴外部 API 原始欄位。
+
+第三步：將 TDX response 轉成專案內部統一格式。
+
+第四步：首頁用使用者定位座標 + 統一格式資料做距離排序。
+
+第五步：停車場頁使用統一格式資料做關鍵字搜尋。
+
+第六步：若 TDX 授權需要 Client Secret，改由後端或 serverless proxy 串接，不把 secret 放在 React 前端。
+
+第七步：若 TDX 某些縣市資料不足，再補各縣市 Open Data adapter。
+
+第八步：建立資料品質標記，例如 `source`、`updatedAt`、`status`、`latitude` / `longitude` 是否存在，讓 UI 可以顯示資料可信度。
+
+## 11. 內部統一資料格式設計方向
+
+本專案應統一輸出兩種核心資料：
+
+- `parkingLotModelExample`：路外停車場。
+- `streetParkingModelExample`：路邊停車格或路段。
+
+共同設計原則：
+
+- 必須保留 `city`、`cityCode`、`district`。
+- 必須保留 `source`，方便追蹤 TDX 或地方 Open Data。
+- 經緯度允許為 `null`，避免資料缺漏造成畫面崩潰。
+- 車位數允許為 `null`，因部分來源可能不提供即時車位。
+- 狀態使用專案內部 enum，不直接使用外部 API 狀態字串。
+- 更新時間使用字串，後續可再統一為 ISO 8601。
+
+目前 mock data 與未來 model 差異：
+
+- mock data 仍以畫面展示為主，欄位較少。
+- mock data 尚未完整包含 `city`、`cityCode`、`district`、`source`、`updatedAt`。
+- 第十一階段已為首頁 mock data 增加 `latitude`、`longitude`，可支援距離排序。
+- 本階段不大幅重構 mock data，避免破壞既有畫面。
+
+## 12. 待確認問題
+
+- TDX 停車 API 的正式 endpoint 與版本。
+- TDX 停車 API 是否完整涵蓋全台路外停車場。
+- TDX 是否有路邊停車格或路邊停車路段 API。
+- TDX 即時剩餘車位與停車場基本資料如何關聯。
+- TDX city code 與本專案 `cityCode` 是否可直接沿用。
+- TDX 經緯度格式是否為 WGS84。
+- TDX API 是否需要 Client Id / Client Secret。
+- TDX 是否允許 browser 端直接呼叫。
+- 各縣市 Open Data 的補充優先順序。
+- 是否需要地址轉座標服務處理缺少經緯度的資料。
