@@ -13,6 +13,7 @@ const ParkingInfoCard = ({ item }) => {
   const {
     name,
     type,
+    district,
     address,
     road,
     distance,
@@ -20,6 +21,7 @@ const ParkingInfoCard = ({ item }) => {
     availableSpaces,
     price,
     isOpen,
+    features = [],
   } = item
   const hasSpaces = availableSpaces > 0
   const locationText = address || road
@@ -34,9 +36,20 @@ const ParkingInfoCard = ({ item }) => {
         <Badge variant={isOpen === false ? 'secondary' : 'primary'}>
           {openStatus}
         </Badge>
+        {features.map((feature) => (
+          <Badge key={feature} variant="secondary">
+            {feature}
+          </Badge>
+        ))}
       </div>
 
       <dl className="parking-card__details">
+        {district && (
+          <div>
+            <dt>行政區</dt>
+            <dd>{district}</dd>
+          </div>
+        )}
         <div>
           <dt>類型</dt>
           <dd>{type}</dd>

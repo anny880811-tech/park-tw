@@ -1,3 +1,4 @@
+// HomePage uses this list for the current-location nearby parking lot section.
 export const nearbyParkingLots = [
   {
     id: 'lot-1',
@@ -34,6 +35,7 @@ export const nearbyParkingLots = [
   },
 ]
 
+// HomePage uses this list for the current-location nearby street parking section.
 export const nearbyStreetParkingSpaces = [
   {
     id: 'street-1',
@@ -64,5 +66,87 @@ export const nearbyStreetParkingSpaces = [
     availableSpaces: 0,
     price: '每小時 30 元',
     status: 'full',
+  },
+]
+
+// ParkingPage uses this list for keyword-based mock searching.
+export const parkingLots = [
+  {
+    id: 'parking-1',
+    name: '市政公園地下停車場',
+    type: '路外停車場',
+    district: '西屯區',
+    address: '台中市西屯區市政北一路',
+    distance: 320,
+    totalSpaces: 120,
+    availableSpaces: 36,
+    price: '每小時 30 元',
+    isOpen: true,
+    features: ['汽車', '機車', '無障礙車位'],
+  },
+  {
+    id: 'parking-2',
+    name: '惠中立體停車場',
+    type: '路外停車場',
+    district: '西屯區',
+    address: '台中市西屯區惠中路二段',
+    distance: 540,
+    totalSpaces: 86,
+    availableSpaces: 12,
+    price: '每小時 40 元',
+    isOpen: true,
+    features: ['汽車', '充電車位'],
+  },
+  {
+    id: 'parking-3',
+    name: '文心森林公園停車場',
+    type: '路外停車場',
+    district: '南屯區',
+    address: '台中市南屯區文心路一段',
+    distance: 960,
+    totalSpaces: 72,
+    availableSpaces: 0,
+    price: '每小時 30 元',
+    isOpen: false,
+    features: ['汽車', '親子車位'],
+  },
+  {
+    id: 'parking-4',
+    name: '台中公園地下停車場',
+    type: '路外停車場',
+    district: '中區',
+    address: '台中市中區公園路',
+    distance: 2100,
+    totalSpaces: 140,
+    availableSpaces: 28,
+    price: '每小時 30 元',
+    isOpen: true,
+    features: ['汽車', '機車'],
+  },
+  {
+    id: 'parking-5',
+    name: '中友百貨停車場',
+    type: '商場停車場',
+    district: '北區',
+    address: '台中市北區三民路三段',
+    distance: 2600,
+    totalSpaces: 210,
+    availableSpaces: 52,
+    price: '每小時 50 元',
+    isOpen: true,
+    features: ['汽車', '室內停車', '商場折抵'],
+  },
+  {
+    id: 'parking-6',
+    name: '草悟道停車場',
+    type: '路外停車場',
+    district: '西區',
+    address: '台中市西區中興街',
+    distance: 1800,
+    totalSpaces: 64,
+    availableSpaces: 7,
+    price: '每小時 40 元',
+    isOpen: true,
+    features: ['汽車', '步行街區'],
   },
 ]

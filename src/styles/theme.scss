@@ -359,6 +359,76 @@ small,
   text-align: right;
 }
 
+.parking-page {
+  padding-bottom: 4rem;
+}
+
+.parking-page__header {
+  padding: 3.5rem 0 2.5rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid rgba(91, 124, 153, 0.1);
+}
+
+.parking-page__intro {
+  display: grid;
+  max-width: 48rem;
+  gap: 0.75rem;
+}
+
+.parking-page__intro h1,
+.parking-search-panel h2,
+.parking-results__header h2,
+.empty-state h2 {
+  margin-bottom: 0;
+}
+
+.parking-page__content {
+  display: grid;
+  gap: 1.5rem;
+  padding-top: 2rem;
+}
+
+.parking-search-panel__content {
+  display: grid;
+  gap: 1rem;
+}
+
+.parking-search-panel__content p,
+.parking-results__header p {
+  color: var(--color-text-secondary);
+}
+
+.parking-search-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.parking-search-panel__clear {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+}
+
+.parking-results {
+  display: grid;
+  gap: 1rem;
+}
+
+.parking-results__header {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.empty-state__content {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
 .navbar {
   min-height: 4.5rem;
   border-bottom: 1px solid rgba(91, 124, 153, 0.1);
@@ -487,6 +557,14 @@ small,
   }
 
   .home-hero__button {
+    width: 100%;
+  }
+
+  .parking-page__header {
+    padding: 2.75rem 0 2rem;
+  }
+
+  .parking-search-panel__clear {
     width: 100%;
   }
 

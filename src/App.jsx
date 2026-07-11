@@ -1,10 +1,10 @@
 import MainLayout from './layouts/MainLayout.jsx'
-import HomePage from './pages/HomePage.jsx'
+import ParkingPage from './pages/ParkingPage.jsx'
 
 const App = () => {
   return (
     <MainLayout>
-      <HomePage />
+      <ParkingPage />
     </MainLayout>
   )
 }
