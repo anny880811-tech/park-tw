@@ -151,6 +151,16 @@ https://<your-preview-url>/api/parking?city=Taipei
 - 已針對 HomePage / ParkingPage 加強 loading、error、empty state 與 fallback 顯示。
 - 資料來源與更新時間提示只顯示安全資訊，不包含 token、secret 或 Authorization header。
 
+第二十六階段：正式部署前檢查。
+
+- 確認 Preview API mode、lint、build 與安全檢查狀態。
+- Production 若要啟用 API mode，仍需在 Vercel 設定 server-side credentials 與公開資料來源設定。
+
+第二十六階段補充：Vercel SPA rewrite。
+
+- 已新增 Vercel SPA rewrite 設定，避免 React Router 前端路由在直接輸入或重新整理時出現 404。
+- `/api` 路徑排除 rewrite，仍交給 Vercel Function 處理。
+
 ## 9. 結論
 
 ```text

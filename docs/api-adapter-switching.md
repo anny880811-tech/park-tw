@@ -110,6 +110,7 @@ fallback meta 範例：
 - 第二十四階段開始測試 ParkingPage API mode。預設仍使用 mock adapter；若設定 `VITE_PARKING_DATA_SOURCE=api`，ParkingPage 會透過 `parkingService` 使用 api adapter 呼叫 `/api/parking`。
 - 目前 ParkingPage API mode 先以預設 city query 測試，尚未完成縣市選擇器、全台搜尋或 TDX keyword server-side search；keyword 暫時只做 client-side filter。
 - 第二十五階段整理 API mode 下的 Loading / Error / Empty State。HomePage 與 ParkingPage 在 API mode 下需避免畫面 crash，並顯示安全的資料來源、fallback 與空狀態提示。
+- Production 若要啟用 API mode，需設定公開前端變數 `VITE_PARKING_DATA_SOURCE=api`；未設定時預設仍使用 mock adapter。
 - 在 Vercel Preview 驗證 `/api/parking?city=Taipei` 成功後，再測試 `VITE_PARKING_DATA_SOURCE=api`。
 - 補齊 `/api/parking` 對 keyword / city / district 的查詢策略。
 - 加入路外停車場即時剩餘車位 endpoint，並與基本資料 merge。

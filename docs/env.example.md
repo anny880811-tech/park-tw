@@ -34,11 +34,13 @@ VITE_PARKING_DATA_SOURCE
 - 這是公開前端設定，不可放任何 secret。
 - `VITE_PARKING_DATA_SOURCE=api` 可用於 Vercel Preview 測試 HomePage API mode。
 - `VITE_PARKING_DATA_SOURCE=api` 也可用於 Vercel Preview 測試 ParkingPage API mode。
+- Production 若要啟用 API mode，也需設定 `VITE_PARKING_DATA_SOURCE=api`。
 
 ## 安全規則
 
 - 不要建立 `.env` 並提交 secret。
 - 不要使用 `VITE_TDX_CLIENT_SECRET`。
+- 不可建立 `VITE_TDX_CLIENT_SECRET`。
 - `VITE_` 前綴環境變數會暴露到前端程式碼，只能放公開資訊。
 - `VITE_PARKING_DATA_SOURCE` 只能放 `mock` 或 `api`，不可放任何密鑰。
 - 不可建立 `VITE_TDX_CLIENT_SECRET`；TDX Client Secret 只能存在 Vercel server-side 環境。

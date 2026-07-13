@@ -209,6 +209,8 @@ VITE_TDX_CLIENT_SECRET
 
 第二十五階段完成 API mode UI 狀態整理。前端仍透過 `parkingService` 與 `/api/parking` 取得資料，不直接呼叫 TDX，也不保存 token 或 secret。
 
+第二十六階段進行正式部署前檢查。確認前端仍透過 `parkingService` 與 `/api/parking` 取得資料，不直接呼叫 TDX，也不保存 token 或 secret。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text
