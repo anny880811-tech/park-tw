@@ -139,6 +139,13 @@ https://<your-preview-url>/api/parking?city=Taipei
 - 前端仍不直接呼叫 TDX，不保存 token 或 secret。
 - 目前 API mode 先以 city query 測試，尚未完成使用者經緯度轉縣市。
 
+第二十四階段：ParkingPage API mode 測試準備。
+
+- `/api/parking` 已可在 Vercel Preview 取得資料。
+- ParkingPage 可透過 `VITE_PARKING_DATA_SOURCE=api` 測試 api adapter。
+- 前端仍不直接呼叫 TDX，不保存 token 或 secret。
+- 目前 ParkingPage API mode 先以預設 city query 測試，keyword 暫時只做 client-side filter。
+
 ## 9. 結論
 
 ```text

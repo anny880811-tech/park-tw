@@ -205,6 +205,8 @@ VITE_TDX_CLIENT_SECRET
 
 第二十三階段開始進行 HomePage API mode 測試。前端仍不直接呼叫 TDX，而是透過 `/api/parking` 與 `parkingService` adapter 切換機制取得資料。
 
+第二十四階段開始進行 ParkingPage API mode 測試。前端仍不直接呼叫 TDX，而是透過 `/api/parking` 與 `parkingService` adapter 切換機制取得資料。目前 ParkingPage API mode 先以預設 city 測試，不進行全台查詢。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text

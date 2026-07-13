@@ -9,6 +9,7 @@ import { searchParkingLots } from '../services/parkingService.js'
 const ParkingPage = () => {
   const [keyword, setKeyword] = useState('')
   const [filteredParkingLots, setFilteredParkingLots] = useState([])
+  const [parkingMeta, setParkingMeta] = useState(null)
   const hasResults = filteredParkingLots.length > 0
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const ParkingPage = () => {
 
       if (isActive) {
         setFilteredParkingLots(result.parkingLots)
+        setParkingMeta(result.meta)
       }
     }
 
@@ -40,6 +42,17 @@ const ParkingPage = () => {
   const handleClearKeyword = () => {
     setKeyword('')
   }
+
+  const dataSourceLabel = parkingMeta?.fallback
+    ? 'Mock Data（API fallback）'
+    : parkingMeta?.dataSource === 'api'
+      ? 'TDX API'
+      : 'Mock Data'
+  const dataSourceDescription = parkingMeta?.fallback
+    ? 'API 資料暫時無法取得，已自動改用 mock data，避免搜尋頁中斷。'
+    : parkingMeta?.dataSource === 'api'
+      ? '目前為 API mode，搜尋頁透過本專案 /api/parking 取得資料，關鍵字暫以 client-side filter 處理。'
+      : '目前使用 mock data，未設定 VITE_PARKING_DATA_SOURCE 時會維持此模式。'
 
   return (
     <div className="parking-page">
@@ -93,6 +106,13 @@ const ParkingPage = () => {
           <p className="mb-0">
             以下搜尋結果來自 parkingLots 假資料，僅做前端搜尋示意，尚未串接停車場 API。
           </p>
+        </div>
+
+        <div className="mock-data-notice">
+          <Badge variant={parkingMeta?.dataSource === 'api' && !parkingMeta?.fallback ? 'primary' : 'secondary'}>
+            {dataSourceLabel}
+          </Badge>
+          <p className="mb-0">{dataSourceDescription}</p>
         </div>
 
         {hasResults ? (

@@ -1,5 +1,23 @@
 const DEFAULT_API_CITY = 'Taichung'
 
+const filterParkingLotsByKeyword = (parkingLots = [], keyword = '') => {
+  const normalizedKeyword = keyword.trim().toLowerCase()
+
+  if (!normalizedKeyword) {
+    return parkingLots
+  }
+
+  return parkingLots.filter((item) => {
+    const searchableText = [
+      item.name,
+      item.address,
+      item.district,
+    ].filter(Boolean).join(' ').toLowerCase()
+
+    return searchableText.includes(normalizedKeyword)
+  })
+}
+
 const fetchParking = async (params) => {
   const queryString = params.toString()
   const url = queryString ? `/api/parking?${queryString}` : '/api/parking'
@@ -37,9 +55,12 @@ export const getNearbyParkingFromApi = async ({ latitude, longitude } = {}) => {
 export const searchParkingLotsFromApi = async ({ keyword } = {}) => {
   const params = new URLSearchParams()
 
-  if (keyword) {
-    params.set('keyword', keyword)
-  }
+  params.set('city', DEFAULT_API_CITY)
 
-  return fetchParking(params)
+  const result = await fetchParking(params)
+
+  return {
+    ...result,
+    parkingLots: filterParkingLotsByKeyword(result.parkingLots, keyword),
+  }
 }

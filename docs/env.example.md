@@ -33,6 +33,7 @@ VITE_PARKING_DATA_SOURCE
 - 控制前端 `parkingService` 使用 mock adapter 或 api adapter。
 - 這是公開前端設定，不可放任何 secret。
 - `VITE_PARKING_DATA_SOURCE=api` 可用於 Vercel Preview 測試 HomePage API mode。
+- `VITE_PARKING_DATA_SOURCE=api` 也可用於 Vercel Preview 測試 ParkingPage API mode。
 
 ## 安全規則
 
