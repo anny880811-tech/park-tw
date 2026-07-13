@@ -193,6 +193,8 @@ VITE_TDX_CLIENT_SECRET
 
 第十四階段開始建立 Vercel Function proxy 骨架，但仍不放入真實 secret，也不呼叫 TDX API。目前前端仍預設使用 mock adapter。未來正式串接時，才會讓 apiParkingAdapter 呼叫 `/api/parking`，並由 Vercel Function 處理 TDX token 與資料 normalize。
 
+第十五階段建立 TDX Access Token Flow 的 server-side 骨架。此階段只驗證 Vercel Function 可以在 server-side 使用環境變數取得 Access Token。目前仍不串接 TDX 停車資料 endpoint，也不讓 React 前端取得 token。前端畫面仍預設使用 mock adapter。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text
