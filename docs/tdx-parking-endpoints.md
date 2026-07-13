@@ -19,6 +19,7 @@
 - TDX Swagger 頁面為動態頁面，本次執行環境無法可靠抽取完整 OpenAPI schema。
 - 因此本文件不硬猜精確 endpoint path 與 raw 欄位名稱。
 - 待確認：需要人工對照 TDX Swagger / OpenAPI schema。
+- 第十七階段已使用路外停車場基本資料 endpoint 做最小可行 server-side 串接測試，前端仍未切換到真實 API。
 
 ## 3. 路外停車場基本資料 endpoint
 
@@ -27,18 +28,18 @@
 | 項目 | 目前結論 |
 | --- | --- |
 | endpoint 名稱 | 路外停車場基本資料，正式名稱待確認 |
-| endpoint path | 待確認：需要人工對照 TDX Swagger / OpenAPI schema |
-| 是否支援指定縣市 | 待確認 |
-| 是否支援 OData query | 待確認 |
-| 是否包含停車場 ID | 待確認 |
-| 是否包含停車場名稱 | 待確認 |
-| 是否包含地址 | 待確認 |
-| 是否包含經緯度 | 待確認 |
+| endpoint path | `/api/basic/v1/Parking/OffStreet/CarPark/City/{city}` |
+| 是否支援指定縣市 | 是，第十七階段以 `Taipei` 測試 |
+| 是否支援 OData query | 第十七階段已使用 `$top=20` 與 `$format=JSON` |
+| 是否包含停車場 ID | 是，已確認 `CarParkID` |
+| 是否包含停車場名稱 | 是，已確認 `CarParkName.Zh_tw` |
+| 是否包含地址 | 是，已確認 `Address` |
+| 是否包含經緯度 | 是，已確認 `CarParkPosition.PositionLat` / `CarParkPosition.PositionLon` |
 | 是否包含總車位 | 待確認 |
 | 是否包含汽車位 / 機車位 | 待確認 |
-| 是否包含收費方式 | 待確認 |
+| 是否包含收費方式 | 是，已確認 `FareDescription` |
 | 是否包含營業時間 | 待確認 |
-| 是否包含更新時間 | 待確認 |
+| 是否包含更新時間 | 是，已確認 wrapper 層級有 `UpdateTime` / `SrcUpdateTime`，單筆資料層級仍待確認 |
 
 設計假設：
 
@@ -156,6 +157,20 @@ TDX API 常見可能支援 OData query，但停車 API 實際支援範圍需以 
 | 待確認：營業狀態 | `isOpen` / `status` | 狀態 badge | 建議 | `isOpen: null`、`status: unknown` | 狀態 enum 對照 |
 | 待確認：更新時間 | `updatedAt` | 資料新鮮度 | 建議 | 空字串 | 時區與格式 |
 
+第十七階段最小 mapping 已先使用下列已觀察欄位：
+
+| TDX raw 欄位 | 內部 model 欄位 | 資料用途 | 是否必要 | 缺漏時處理方式 | 待確認事項 |
+| --- | --- | --- | --- | --- | --- |
+| `CarParkID` | `id` | 停車場識別 | 是 | 空字串，後續應排除無 ID 資料 | 是否跨 endpoint 穩定 |
+| `CarParkName.Zh_tw` | `name` | 卡片標題與搜尋 | 是 | 空字串 | 多語系欄位完整規則 |
+| `City` | `city` | 城市識別 | 建議 | 空字串 | 是否所有城市皆提供 |
+| `CityCode` / `AuthorityCode` | `cityCode` | 城市代碼 | 建議 | 空字串 | `AuthorityCode` 是否可作為 fallback |
+| `Address` | `address` | 顯示與搜尋 | 建議 | 空字串 | 行政區是否需另行解析 |
+| `CarParkPosition.PositionLat` | `latitude` | 距離計算 | 建議 | `null` | 座標格式仍需正式確認 |
+| `CarParkPosition.PositionLon` | `longitude` | 距離計算 | 建議 | `null` | 座標格式仍需正式確認 |
+| `FareDescription` | `price` | 收費顯示 | 選用 | 空字串 | 是否需要結構化費率 |
+| `UpdateTime` / `SrcUpdateTime` | `updatedAt` | 資料新鮮度 | 建議 | 空字串 | wrapper 與單筆層級差異 |
+
 ### 路外停車場即時剩餘車位
 
 | TDX raw 欄位 | 內部 model 欄位 | 資料用途 | 是否必要 | 缺漏時處理方式 | 待確認事項 |
@@ -208,14 +223,15 @@ TDX API 常見可能支援 OData query，但停車 API 實際支援範圍需以 
 
 ### 最小可行串接建議
 
-第一個真實 API 串接階段建議只選定一個縣市與一組路外停車場 endpoint：
+第十七階段已選定一個縣市與一組路外停車場 endpoint 做 server-side 最小可行串接測試：
 
-1. 先取得路外停車場基本資料。
-2. 再取得路外停車場即時剩餘車位。
-3. 以 ID merge。
+1. `/api/parking?city=Taipei` 由 Vercel Function 取得 server-side access token。
+2. 呼叫 `Parking/OffStreet/CarPark/City/{city}`。
+3. 使用 `$top=20` 限制筆數，使用 `$format=JSON` 取得 JSON。
 4. 使用 `server/tdxParkingMapper.js` normalize。
 5. 讓 `/api/parking` 回傳內部格式。
-6. 確認資料穩定後，再擴充到路邊停車與多縣市。
+6. 前端仍預設使用 mock adapter，尚未正式替換 HomePage / ParkingPage 資料來源。
+7. 後續再擴充即時剩餘車位、路邊停車、多縣市與 API adapter 切換策略。
 
 ## 10. 待確認問題
 

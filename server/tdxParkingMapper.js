@@ -4,29 +4,47 @@ import {
   PARKING_TYPES,
 } from '../src/models/parkingModel.js'
 
+const getLocalizedText = (value) => {
+  if (typeof value === 'string') {
+    return value
+  }
+
+  if (!value || typeof value !== 'object') {
+    return ''
+  }
+
+  return value.Zh_tw || value.ZhTw || value.En || ''
+}
+
+const toNumberOrNull = (value) => {
+  const numberValue = Number(value)
+
+  return Number.isFinite(numberValue) ? numberValue : null
+}
+
 export const normalizeTdxParkingLot = (rawItem = {}) => {
-  void rawItem
+  const position = rawItem.CarParkPosition || {}
 
   return {
-    // TODO: map TDX off-street parking facility fields after confirming OpenAPI schema.
-    id: '',
-    name: '',
+    // TODO: Map totalSpaces, carSpaces, motorSpaces, district and open status after confirming TDX schema.
+    id: rawItem.CarParkID || '',
+    name: getLocalizedText(rawItem.CarParkName),
     type: PARKING_TYPES.OFF_STREET,
     source: PARKING_SOURCES.TDX,
-    city: '',
-    cityCode: '',
+    city: rawItem.City || '',
+    cityCode: rawItem.CityCode || rawItem.AuthorityCode || '',
     district: '',
-    address: '',
-    latitude: null,
-    longitude: null,
+    address: rawItem.Address || '',
+    latitude: toNumberOrNull(position.PositionLat),
+    longitude: toNumberOrNull(position.PositionLon),
     totalSpaces: null,
     availableSpaces: null,
     carSpaces: null,
     motorSpaces: null,
-    price: '',
+    price: rawItem.FareDescription || '',
     isOpen: null,
     status: PARKING_STATUS.UNKNOWN,
-    updatedAt: '',
+    updatedAt: rawItem.UpdateTime || rawItem.SrcUpdateTime || '',
   }
 }
 

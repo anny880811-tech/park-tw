@@ -23,6 +23,9 @@ TDX_CLIENT_SECRET
 - Vercel Function 才能讀取 `process.env.TDX_CLIENT_ID` 與 `process.env.TDX_CLIENT_SECRET`。
 - Access Token 不會回傳給 React 前端。
 - 本地開發若需要測試 Vercel Function，應使用安全的本地環境設定方式，但不要提交任何真實 secret。
+- Vercel Preview 測試 `/api/parking` 時，需在 Vercel 後台設定 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET`。
+- 本地不應建立會被提交到 Git 的 `.env` 來保存正式密鑰。
+- 若未來需要本地測試 Vercel Function，需使用安全方式管理本地環境變數，且仍不可使用 `VITE_TDX_CLIENT_SECRET`。
 
 ## 未來資料流
 
@@ -36,4 +39,4 @@ Vercel Function normalize response
 React 前端接收統一格式資料
 ```
 
-本階段只建立 proxy 與 token flow 骨架，不填入任何金鑰，不呼叫 TDX 停車資料 API。
+本階段只建立 proxy、token flow 與 Preview 測試文件，不填入任何金鑰，不切換前端資料來源。

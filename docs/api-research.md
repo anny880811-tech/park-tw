@@ -197,6 +197,10 @@ VITE_TDX_CLIENT_SECRET
 
 第十六階段整理 TDX 停車 API endpoint 與欄位 mapping，並建立 server-side mapper skeleton。本階段仍不呼叫 TDX 停車資料 API，也不讓前端切換到真實 API。下一階段才會選定最小可行 endpoint 做實際串接測試。
 
+第十七階段開始最小可行 TDX endpoint 串接測試，只在 server-side `/api/parking.js` 呼叫路外停車場基本資料 endpoint，並使用 `server/tdxParkingMapper.js` normalize response。前端仍預設使用 mock adapter，尚未正式替換 HomePage / ParkingPage 資料來源；後續才會設計 API adapter 切換策略。
+
+第十八階段準備 Vercel Preview 測試文件與安全檢查流程。本階段不切換前端資料來源，HomePage / ParkingPage 仍使用 mock adapter。實際 TDX API 測試需在 Vercel server-side 環境設定 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET`。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text
