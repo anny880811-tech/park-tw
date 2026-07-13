@@ -5,14 +5,19 @@ import {
 import { normalizeTdxParkingLot } from '../server/tdxParkingMapper.js'
 
 const REQUIRED_ENV = ['TDX_CLIENT_ID', 'TDX_CLIENT_SECRET']
-const DEFAULT_CITY = 'Taipei'
+const DEFAULT_CITY = 'Taichung'
 const TDX_PARKING_API_BASE_URL = 'https://tdx.transportdata.tw/api/basic/v1/Parking/OffStreet/CarPark/City'
+const SUPPORTED_CITIES = {
+  taichung: 'Taichung',
+  taipei: 'Taipei',
+}
 
 const getCity = (request) => {
   const requestUrl = new URL(request.url, 'http://localhost')
-  const city = requestUrl.searchParams.get('city') || DEFAULT_CITY
+  const city = requestUrl.searchParams.get('city') || ''
+  const normalizedCity = city.trim().toLowerCase()
 
-  return /^[A-Za-z]+$/.test(city) ? city : DEFAULT_CITY
+  return SUPPORTED_CITIES[normalizedCity] || DEFAULT_CITY
 }
 
 const buildTdxParkingUrl = (city) => {
