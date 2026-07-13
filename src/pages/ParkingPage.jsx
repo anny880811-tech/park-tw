@@ -3,12 +3,19 @@ import ParkingInfoCard from '../components/parking/ParkingInfoCard.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
+import DataStatusNotice from '../components/ui/DataStatusNotice.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
 import { searchParkingLots } from '../services/parkingService.js'
 
+const getLatestUpdatedAt = (items = []) => {
+  return items.find((item) => item.updatedAt)?.updatedAt || ''
+}
+
 const ParkingPage = () => {
   const [keyword, setKeyword] = useState('')
+  const [dataError, setDataError] = useState('')
   const [filteredParkingLots, setFilteredParkingLots] = useState([])
+  const [isDataLoading, setIsDataLoading] = useState(true)
   const [parkingMeta, setParkingMeta] = useState(null)
   const hasResults = filteredParkingLots.length > 0
 
@@ -16,11 +23,26 @@ const ParkingPage = () => {
     let isActive = true
 
     const loadParkingLots = async () => {
-      const result = await searchParkingLots({ keyword })
+      setIsDataLoading(true)
+      setDataError('')
 
-      if (isActive) {
-        setFilteredParkingLots(result.parkingLots)
-        setParkingMeta(result.meta)
+      try {
+        const result = await searchParkingLots({ keyword })
+
+        if (isActive) {
+          setFilteredParkingLots(result.parkingLots)
+          setParkingMeta(result.meta)
+        }
+      } catch {
+        if (isActive) {
+          setFilteredParkingLots([])
+          setParkingMeta(null)
+          setDataError('目前無法取得停車資料，請稍後再試。')
+        }
+      } finally {
+        if (isActive) {
+          setIsDataLoading(false)
+        }
       }
     }
 
@@ -42,17 +64,7 @@ const ParkingPage = () => {
   const handleClearKeyword = () => {
     setKeyword('')
   }
-
-  const dataSourceLabel = parkingMeta?.fallback
-    ? 'Mock Data（API fallback）'
-    : parkingMeta?.dataSource === 'api'
-      ? 'TDX API'
-      : 'Mock Data'
-  const dataSourceDescription = parkingMeta?.fallback
-    ? 'API 資料暫時無法取得，已自動改用 mock data，避免搜尋頁中斷。'
-    : parkingMeta?.dataSource === 'api'
-      ? '目前為 API mode，搜尋頁透過本專案 /api/parking 取得資料，關鍵字暫以 client-side filter 處理。'
-      : '目前使用 mock data，未設定 VITE_PARKING_DATA_SOURCE 時會維持此模式。'
+  const updatedAt = getLatestUpdatedAt(filteredParkingLots)
 
   return (
     <div className="parking-page">
@@ -108,14 +120,15 @@ const ParkingPage = () => {
           </p>
         </div>
 
-        <div className="mock-data-notice">
-          <Badge variant={parkingMeta?.dataSource === 'api' && !parkingMeta?.fallback ? 'primary' : 'secondary'}>
-            {dataSourceLabel}
-          </Badge>
-          <p className="mb-0">{dataSourceDescription}</p>
-        </div>
+        <DataStatusNotice
+          error={dataError}
+          isLoading={isDataLoading}
+          loadingText="正在搜尋停車場..."
+          meta={parkingMeta}
+          updatedAt={updatedAt}
+        />
 
-        {hasResults ? (
+        {isDataLoading ? null : hasResults ? (
           <section className="parking-results">
             <div className="parking-results__header">
               <h2>停車場列表</h2>

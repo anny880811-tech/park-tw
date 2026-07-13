@@ -3,12 +3,20 @@ import NearbyParkingSection from '../components/parking/NearbyParkingSection.jsx
 import LocationStatus from '../components/location/LocationStatus.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
+import Card from '../components/ui/Card.jsx'
+import DataStatusNotice from '../components/ui/DataStatusNotice.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
 import { getNearbyParking } from '../services/parkingService.js'
+
+const getLatestUpdatedAt = (items = []) => {
+  return items.find((item) => item.updatedAt)?.updatedAt || ''
+}
 
 const HomePage = () => {
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
+  const [dataError, setDataError] = useState('')
+  const [isDataLoading, setIsDataLoading] = useState(true)
   const [parkingMeta, setParkingMeta] = useState(null)
   const {
     status,
@@ -23,18 +31,34 @@ const HomePage = () => {
     let isActive = true
 
     const loadNearbyParking = async () => {
-      const locationParams = canSortByPosition
-        ? {
-            latitude: position.latitude,
-            longitude: position.longitude,
-          }
-        : undefined
-      const result = await getNearbyParking(locationParams)
+      setIsDataLoading(true)
+      setDataError('')
 
-      if (isActive) {
-        setParkingLots(result.parkingLots)
-        setStreetParkingSpaces(result.streetParkingSpaces)
-        setParkingMeta(result.meta)
+      try {
+        const locationParams = canSortByPosition
+          ? {
+              latitude: position.latitude,
+              longitude: position.longitude,
+            }
+          : undefined
+        const result = await getNearbyParking(locationParams)
+
+        if (isActive) {
+          setParkingLots(result.parkingLots)
+          setStreetParkingSpaces(result.streetParkingSpaces)
+          setParkingMeta(result.meta)
+        }
+      } catch {
+        if (isActive) {
+          setParkingLots([])
+          setStreetParkingSpaces([])
+          setParkingMeta(null)
+          setDataError('目前無法取得停車資料，請稍後再試。')
+        }
+      } finally {
+        if (isActive) {
+          setIsDataLoading(false)
+        }
       }
     }
 
@@ -44,17 +68,8 @@ const HomePage = () => {
       isActive = false
     }
   }, [canSortByPosition, position])
-
-  const dataSourceLabel = parkingMeta?.fallback
-    ? 'Mock Data（API fallback）'
-    : parkingMeta?.dataSource === 'api'
-      ? 'TDX API'
-      : 'Mock Data'
-  const dataSourceDescription = parkingMeta?.fallback
-    ? 'API 資料暫時無法取得，已自動改用 mock data，避免畫面中斷。'
-    : parkingMeta?.dataSource === 'api'
-      ? '目前為 API mode，資料透過本專案 /api/parking 取得，前端不直接呼叫 TDX。'
-      : '目前使用 mock data，未設定 VITE_PARKING_DATA_SOURCE 時會維持此模式。'
+  const updatedAt = getLatestUpdatedAt(parkingLots)
+  const hasNearbyParkingData = parkingLots.length > 0 || streetParkingSpaces.length > 0
 
   return (
     <div className="home-page">
@@ -87,12 +102,13 @@ const HomePage = () => {
       <section className="container home-page__content">
         <LocationStatus error={error} position={position} status={status} />
 
-        <div className="mock-data-notice">
-          <Badge variant={parkingMeta?.dataSource === 'api' && !parkingMeta?.fallback ? 'primary' : 'secondary'}>
-            {dataSourceLabel}
-          </Badge>
-          <p className="mb-0">{dataSourceDescription}</p>
-        </div>
+        <DataStatusNotice
+          error={dataError}
+          isLoading={isDataLoading}
+          loadingText="正在載入停車資料..."
+          meta={parkingMeta}
+          updatedAt={updatedAt}
+        />
 
         <div className="mock-data-notice">
           <Badge variant="secondary">Mock Data</Badge>
@@ -101,17 +117,29 @@ const HomePage = () => {
           </p>
         </div>
 
-        <NearbyParkingSection
-          description="顯示目前位置附近的路外停車場、剩餘車位與收費資訊。"
-          items={parkingLots}
-          title="附近停車場"
-        />
+        {!isDataLoading && !hasNearbyParkingData ? (
+          <Card className="empty-state">
+            <div className="empty-state__content">
+              <Badge variant="secondary">目前無資料</Badge>
+              <h2>目前沒有可顯示的停車資料</h2>
+              <p className="mb-0">請稍後再試，或改用停車場搜尋頁查詢。</p>
+            </div>
+          </Card>
+        ) : (
+          <>
+            <NearbyParkingSection
+              description="顯示目前位置附近的路外停車場、剩餘車位與收費資訊。"
+              items={parkingLots}
+              title="附近停車場"
+            />
 
-        <NearbyParkingSection
-          description="顯示目前位置附近的路邊停車格與可用格位。"
-          items={streetParkingSpaces}
-          title="附近路邊停車格"
-        />
+            <NearbyParkingSection
+              description="顯示目前位置附近的路邊停車格與可用格位。"
+              items={streetParkingSpaces}
+              title="附近路邊停車格"
+            />
+          </>
+        )}
       </section>
     </div>
   )

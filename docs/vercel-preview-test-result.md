@@ -146,6 +146,11 @@ https://<your-preview-url>/api/parking?city=Taipei
 - 前端仍不直接呼叫 TDX，不保存 token 或 secret。
 - 目前 ParkingPage API mode 先以預設 city query 測試，keyword 暫時只做 client-side filter。
 
+第二十五階段：API mode UI 狀態整理。
+
+- 已針對 HomePage / ParkingPage 加強 loading、error、empty state 與 fallback 顯示。
+- 資料來源與更新時間提示只顯示安全資訊，不包含 token、secret 或 Authorization header。
+
 ## 9. 結論
 
 ```text
