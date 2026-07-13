@@ -7,6 +7,7 @@ import { normalizeTdxParkingLot } from '../server/tdxParkingMapper.js'
 const REQUIRED_ENV = ['TDX_CLIENT_ID', 'TDX_CLIENT_SECRET']
 const DEFAULT_CITY = 'Taichung'
 const TDX_PARKING_API_BASE_URL = 'https://tdx.transportdata.tw/api/basic/v1/Parking/OffStreet/CarPark/City'
+const SAFE_ENDPOINT_NAME = 'Parking/OffStreet/CarPark/City'
 const SUPPORTED_CITIES = {
   taichung: 'Taichung',
   taipei: 'Taipei',
@@ -56,6 +57,8 @@ const sendJson = (response, statusCode, data) => {
 }
 
 export default async function handler(request, response) {
+  const city = getCity(request)
+
   if (request.method !== 'GET') {
     response.setHeader('Allow', 'GET')
     sendJson(response, 405, {
@@ -79,8 +82,28 @@ export default async function handler(request, response) {
   }
 
   try {
-    const city = getCity(request)
-    const accessToken = await getTdxAccessToken()
+    let accessToken
+
+    try {
+      accessToken = await getTdxAccessToken()
+    } catch {
+      sendJson(response, 502, {
+        parkingLots: [],
+        streetParkingSpaces: [],
+        meta: {
+          source: 'tdx',
+          mode: 'minimal-api-error',
+          city,
+          endpoint: SAFE_ENDPOINT_NAME,
+          errorStage: 'tdx-auth',
+          tokenReady: false,
+          message: 'Failed to fetch TDX parking data.',
+          detail: 'TDX parking request failed.',
+        },
+      })
+      return
+    }
+
     const tdxResponse = await fetch(buildTdxParkingUrl(city), {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -88,11 +111,67 @@ export default async function handler(request, response) {
     })
 
     if (!tdxResponse.ok) {
-      throw new Error(`TDX parking endpoint responded with status ${tdxResponse.status}.`)
+      sendJson(response, 502, {
+        parkingLots: [],
+        streetParkingSpaces: [],
+        meta: {
+          source: 'tdx',
+          mode: 'minimal-api-error',
+          city,
+          endpoint: SAFE_ENDPOINT_NAME,
+          errorStage: 'tdx-fetch',
+          status: tdxResponse.status,
+          tokenReady: true,
+          message: 'Failed to fetch TDX parking data.',
+          detail: 'TDX parking request failed.',
+        },
+      })
+      return
     }
 
-    const rawParkingData = await tdxResponse.json()
-    const parkingLots = extractCarParks(rawParkingData).map(normalizeTdxParkingLot)
+    let rawParkingData
+
+    try {
+      rawParkingData = await tdxResponse.json()
+    } catch {
+      sendJson(response, 502, {
+        parkingLots: [],
+        streetParkingSpaces: [],
+        meta: {
+          source: 'tdx',
+          mode: 'minimal-api-error',
+          city,
+          endpoint: SAFE_ENDPOINT_NAME,
+          errorStage: 'tdx-parse',
+          tokenReady: true,
+          message: 'Failed to fetch TDX parking data.',
+          detail: 'TDX parking request failed.',
+        },
+      })
+      return
+    }
+
+    let parkingLots
+
+    try {
+      parkingLots = extractCarParks(rawParkingData).map(normalizeTdxParkingLot)
+    } catch {
+      sendJson(response, 502, {
+        parkingLots: [],
+        streetParkingSpaces: [],
+        meta: {
+          source: 'tdx',
+          mode: 'minimal-api-error',
+          city,
+          endpoint: SAFE_ENDPOINT_NAME,
+          errorStage: 'mapper',
+          tokenReady: true,
+          message: 'Failed to fetch TDX parking data.',
+          detail: 'TDX parking request failed.',
+        },
+      })
+      return
+    }
 
     sendJson(response, 200, {
       parkingLots,
@@ -112,6 +191,9 @@ export default async function handler(request, response) {
       meta: {
         source: 'tdx',
         mode: 'minimal-api-error',
+        city,
+        endpoint: SAFE_ENDPOINT_NAME,
+        errorStage: 'unknown',
         tokenReady: false,
         message: 'Failed to fetch TDX parking data.',
         detail: 'TDX parking request failed.',
