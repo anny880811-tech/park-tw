@@ -100,7 +100,7 @@ export default async function handler(request, response) {
         tokenReady: true,
       },
     })
-  } catch (error) {
+  } catch {
     sendJson(response, 502, {
       parkingLots: [],
       streetParkingSpaces: [],
@@ -109,7 +109,7 @@ export default async function handler(request, response) {
         mode: 'minimal-api-error',
         tokenReady: false,
         message: 'Failed to fetch TDX parking data.',
-        detail: error.message,
+        detail: 'TDX parking request failed.',
       },
     })
   }
