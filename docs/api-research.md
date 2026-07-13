@@ -191,6 +191,8 @@ VITE_TDX_CLIENT_SECRET
 
 第八步：建立資料品質標記，例如 `source`、`updatedAt`、`status`、`latitude` / `longitude` 是否存在，讓 UI 可以顯示資料可信度。
 
+第十四階段開始建立 Vercel Function proxy 骨架，但仍不放入真實 secret，也不呼叫 TDX API。目前前端仍預設使用 mock adapter。未來正式串接時，才會讓 apiParkingAdapter 呼叫 `/api/parking`，並由 Vercel Function 處理 TDX token 與資料 normalize。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text

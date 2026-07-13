@@ -1,16 +1,35 @@
-const apiAdapterError = () => {
-  throw new Error('API parking adapter is not implemented yet.')
+const fetchParking = async (params) => {
+  const queryString = params.toString()
+  const url = queryString ? `/api/parking?${queryString}` : '/api/parking'
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch parking data.')
+  }
+
+  return response.json()
 }
 
 export const getNearbyParkingFromApi = async ({ latitude, longitude } = {}) => {
-  // TODO: Call /api/parking?latitude=...&longitude=... after server-side proxy exists.
-  void latitude
-  void longitude
-  apiAdapterError()
+  const params = new URLSearchParams()
+
+  if (Number.isFinite(latitude)) {
+    params.set('latitude', latitude)
+  }
+
+  if (Number.isFinite(longitude)) {
+    params.set('longitude', longitude)
+  }
+
+  return fetchParking(params)
 }
 
 export const searchParkingLotsFromApi = async ({ keyword } = {}) => {
-  // TODO: Call /api/parking/search?keyword=... after server-side proxy exists.
-  void keyword
-  apiAdapterError()
+  const params = new URLSearchParams()
+
+  if (keyword) {
+    params.set('keyword', keyword)
+  }
+
+  return fetchParking(params)
 }
