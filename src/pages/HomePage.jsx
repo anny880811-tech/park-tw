@@ -9,6 +9,7 @@ import { getNearbyParking } from '../services/parkingService.js'
 const HomePage = () => {
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
+  const [parkingMeta, setParkingMeta] = useState(null)
   const {
     status,
     position,
@@ -33,6 +34,7 @@ const HomePage = () => {
       if (isActive) {
         setParkingLots(result.parkingLots)
         setStreetParkingSpaces(result.streetParkingSpaces)
+        setParkingMeta(result.meta)
       }
     }
 
@@ -42,6 +44,17 @@ const HomePage = () => {
       isActive = false
     }
   }, [canSortByPosition, position])
+
+  const dataSourceLabel = parkingMeta?.fallback
+    ? 'Mock Data（API fallback）'
+    : parkingMeta?.dataSource === 'api'
+      ? 'TDX API'
+      : 'Mock Data'
+  const dataSourceDescription = parkingMeta?.fallback
+    ? 'API 資料暫時無法取得，已自動改用 mock data，避免畫面中斷。'
+    : parkingMeta?.dataSource === 'api'
+      ? '目前為 API mode，資料透過本專案 /api/parking 取得，前端不直接呼叫 TDX。'
+      : '目前使用 mock data，未設定 VITE_PARKING_DATA_SOURCE 時會維持此模式。'
 
   return (
     <div className="home-page">
@@ -73,6 +86,13 @@ const HomePage = () => {
 
       <section className="container home-page__content">
         <LocationStatus error={error} position={position} status={status} />
+
+        <div className="mock-data-notice">
+          <Badge variant={parkingMeta?.dataSource === 'api' && !parkingMeta?.fallback ? 'primary' : 'secondary'}>
+            {dataSourceLabel}
+          </Badge>
+          <p className="mb-0">{dataSourceDescription}</p>
+        </div>
 
         <div className="mock-data-notice">
           <Badge variant="secondary">Mock Data</Badge>

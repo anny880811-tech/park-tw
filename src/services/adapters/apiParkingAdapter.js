@@ -1,3 +1,5 @@
+const DEFAULT_API_CITY = 'Taichung'
+
 const fetchParking = async (params) => {
   const queryString = params.toString()
   const url = queryString ? `/api/parking?${queryString}` : '/api/parking'
@@ -7,11 +9,19 @@ const fetchParking = async (params) => {
     throw new Error('Failed to fetch parking data.')
   }
 
-  return response.json()
+  const result = await response.json()
+
+  if (result.meta?.mode && result.meta.mode !== 'minimal-api-integration') {
+    throw new Error('Parking API did not return usable data.')
+  }
+
+  return result
 }
 
 export const getNearbyParkingFromApi = async ({ latitude, longitude } = {}) => {
   const params = new URLSearchParams()
+
+  params.set('city', DEFAULT_API_CITY)
 
   if (Number.isFinite(latitude)) {
     params.set('latitude', latitude)

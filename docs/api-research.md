@@ -203,6 +203,8 @@ VITE_TDX_CLIENT_SECRET
 
 第二十階段建立 API adapter 切換機制。目前預設仍使用 mock adapter，未來可透過公開設定 `VITE_PARKING_DATA_SOURCE=api` 切換到 api adapter。TDX Client Secret 仍只存在 server-side，不會進入 React 前端。
 
+第二十三階段開始進行 HomePage API mode 測試。前端仍不直接呼叫 TDX，而是透過 `/api/parking` 與 `parkingService` adapter 切換機制取得資料。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text

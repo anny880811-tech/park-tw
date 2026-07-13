@@ -32,6 +32,7 @@ VITE_PARKING_DATA_SOURCE
 
 - 控制前端 `parkingService` 使用 mock adapter 或 api adapter。
 - 這是公開前端設定，不可放任何 secret。
+- `VITE_PARKING_DATA_SOURCE=api` 可用於 Vercel Preview 測試 HomePage API mode。
 
 ## 安全規則
 
@@ -39,6 +40,7 @@ VITE_PARKING_DATA_SOURCE
 - 不要使用 `VITE_TDX_CLIENT_SECRET`。
 - `VITE_` 前綴環境變數會暴露到前端程式碼，只能放公開資訊。
 - `VITE_PARKING_DATA_SOURCE` 只能放 `mock` 或 `api`，不可放任何密鑰。
+- 不可建立 `VITE_TDX_CLIENT_SECRET`；TDX Client Secret 只能存在 Vercel server-side 環境。
 - Client Secret 只能在 Vercel Function 等 server-side 執行環境使用。
 - React 前端只能呼叫本專案 API route，例如 `/api/parking`。
 - Vercel Function 才能讀取 `process.env.TDX_CLIENT_ID` 與 `process.env.TDX_CLIENT_SECRET`。

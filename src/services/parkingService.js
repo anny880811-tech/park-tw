@@ -42,6 +42,7 @@ export const getNearbyParking = async ({ latitude, longitude } = {}) => {
     return withMeta(result, {
       dataSource: PARKING_DATA_SOURCES.API,
       fallback: false,
+      api: result.meta,
     })
   } catch {
     return fallbackToMock(() => getNearbyParkingFromMock(params), {
@@ -70,6 +71,7 @@ export const searchParkingLots = async ({ keyword } = {}) => {
     return withMeta(result, {
       dataSource: PARKING_DATA_SOURCES.API,
       fallback: false,
+      api: result.meta,
     })
   } catch {
     return fallbackToMock(() => searchParkingLotsFromMock(params), {

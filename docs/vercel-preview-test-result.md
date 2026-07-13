@@ -132,6 +132,13 @@ https://<your-preview-url>/api/parking?city=Taipei
 目前無本地檢查阻擋項目；Preview 實測結果待使用者手動補上。
 ```
 
+第二十三階段：HomePage API mode 測試準備。
+
+- `/api/parking` 已可在 Vercel Preview 取得資料。
+- HomePage 可透過 `VITE_PARKING_DATA_SOURCE=api` 測試 api adapter。
+- 前端仍不直接呼叫 TDX，不保存 token 或 secret。
+- 目前 API mode 先以 city query 測試，尚未完成使用者經緯度轉縣市。
+
 ## 9. 結論
 
 ```text
