@@ -35,6 +35,7 @@ export default async function handler(request, response) {
   try {
     await getTdxAccessToken()
 
+    // TODO: Next stage will call TDX parking endpoints and normalize data with server/tdxParkingMapper.js.
     sendJson(response, 200, {
       parkingLots: [],
       streetParkingSpaces: [],

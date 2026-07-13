@@ -195,6 +195,8 @@ VITE_TDX_CLIENT_SECRET
 
 第十五階段建立 TDX Access Token Flow 的 server-side 骨架。此階段只驗證 Vercel Function 可以在 server-side 使用環境變數取得 Access Token。目前仍不串接 TDX 停車資料 endpoint，也不讓 React 前端取得 token。前端畫面仍預設使用 mock adapter。
 
+第十六階段整理 TDX 停車 API endpoint 與欄位 mapping，並建立 server-side mapper skeleton。本階段仍不呼叫 TDX 停車資料 API，也不讓前端切換到真實 API。下一階段才會選定最小可行 endpoint 做實際串接測試。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text
