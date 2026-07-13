@@ -201,6 +201,8 @@ VITE_TDX_CLIENT_SECRET
 
 第十八階段準備 Vercel Preview 測試文件與安全檢查流程。本階段不切換前端資料來源，HomePage / ParkingPage 仍使用 mock adapter。實際 TDX API 測試需在 Vercel server-side 環境設定 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET`。
 
+第二十階段建立 API adapter 切換機制。目前預設仍使用 mock adapter，未來可透過公開設定 `VITE_PARKING_DATA_SOURCE=api` 切換到 api adapter。TDX Client Secret 仍只存在 server-side，不會進入 React 前端。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text
