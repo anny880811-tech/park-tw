@@ -1,4 +1,6 @@
 const DEFAULT_API_CITY = 'Taichung'
+let cachedParkingResult = null
+let pendingParkingRequest = null
 
 const filterParkingLotsByKeyword = (parkingLots = [], keyword = '') => {
   const normalizedKeyword = keyword.trim().toLowerCase()
@@ -36,28 +38,38 @@ const fetchParking = async (params) => {
   return result
 }
 
-export const getNearbyParkingFromApi = async ({ latitude, longitude } = {}) => {
+const fetchDefaultCityParking = async () => {
+  if (cachedParkingResult) {
+    return cachedParkingResult
+  }
+
+  if (pendingParkingRequest) {
+    return pendingParkingRequest
+  }
+
   const params = new URLSearchParams()
 
   params.set('city', DEFAULT_API_CITY)
 
-  if (Number.isFinite(latitude)) {
-    params.set('latitude', latitude)
-  }
+  pendingParkingRequest = fetchParking(params)
+    .then((result) => {
+      cachedParkingResult = result
 
-  if (Number.isFinite(longitude)) {
-    params.set('longitude', longitude)
-  }
+      return result
+    })
+    .finally(() => {
+      pendingParkingRequest = null
+    })
 
-  return fetchParking(params)
+  return pendingParkingRequest
+}
+
+export const getNearbyParkingFromApi = async () => {
+  return fetchDefaultCityParking()
 }
 
 export const searchParkingLotsFromApi = async ({ keyword } = {}) => {
-  const params = new URLSearchParams()
-
-  params.set('city', DEFAULT_API_CITY)
-
-  const result = await fetchParking(params)
+  const result = await fetchDefaultCityParking()
 
   return {
     ...result,
