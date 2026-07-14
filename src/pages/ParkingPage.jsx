@@ -150,7 +150,9 @@ const ParkingPage = () => {
             />
             <div className="parking-search-panel__meta">
               <span>
-                共找到 {filteredParkingLots.length} 筆符合條件的停車場
+                共找到 {filteredParkingLots.length} 筆
+                {canSortByPosition ? ' 2 公里內' : ''}
+                符合條件的停車場
                 {hasResults ? `，第 ${safeCurrentPage} / ${totalPages} 頁` : ''}
               </span>
               <Button
@@ -185,8 +187,8 @@ const ParkingPage = () => {
           </Badge>
           <p className="mb-0">
             {canSortByPosition
-              ? '已依你的目前位置由近到遠排序。'
-              : '尚未取得位置，顯示預設排序。'}
+              ? '已篩選你目前位置 2 公里內的停車場，並由近到遠排序。'
+              : '尚未取得位置，顯示預設排序；取得定位後會顯示 2 公里內資料。'}
           </p>
         </div>
 

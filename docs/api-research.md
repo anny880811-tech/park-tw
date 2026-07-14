@@ -213,7 +213,7 @@ VITE_TDX_CLIENT_SECRET
 
 第二十八階段開始統一處理使用者座標距離排序。若 API 回傳資料沒有 `latitude` / `longitude`，前端無法進行精準距離排序；後續需合併 TDX CarPark 基本資料與 ParkingAvailability 即時車位資料，才能在 API mode 下完整支援由近到遠排序。
 
-第二十九階段讓 `/api/parking` 合併 TDX CarPark 基本資料與 ParkingAvailability 即時剩餘車位資料。API mode 若要支援 1km 範圍篩選與距離排序，需要停車場經緯度，因此由 CarPark 提供位置與地址，再以 ParkingAvailability 補足剩餘車位、服務狀態與更新時間。
+第二十九階段讓 `/api/parking` 合併 TDX CarPark 基本資料與 ParkingAvailability 即時剩餘車位資料。API mode 若要支援 2 公里範圍篩選與距離排序，需要停車場經緯度，因此由 CarPark 提供位置與地址，再以 ParkingAvailability 補足剩餘車位、服務狀態與更新時間。
 
 未來正式串接 TDX 時，建議資料流為：
 
@@ -292,5 +292,5 @@ TDX_CLIENT_SECRET
 
 本階段不建立 Vercel Function、不建立 `/api` 資料夾、不建立 `.env`、不填入任何金鑰。上述內容只作為未來正式 API 串接時的安全架構建議。
 
-第三十階段移除 `/api/parking` 的 `$top=20` 測試限制，讓 city endpoint 回傳的符合資料可完整保留。ParkingPage 會在搜尋、定位與距離排序完成後，於畫面層以每頁 12 張卡片分頁顯示。
+第三十階段移除 `/api/parking` 的 `$top=20` 測試限制，讓 city endpoint 回傳的符合資料可完整保留。ParkingPage 會以使用者座標為中心，顯示 2 公里內符合條件的停車場，並在搜尋、距離排序完成後，於畫面層以每頁 12 張卡片分頁顯示。
 

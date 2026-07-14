@@ -112,7 +112,7 @@ fallback meta 範例：
 - 第二十五階段整理 API mode 下的 Loading / Error / Empty State。HomePage 與 ParkingPage 在 API mode 下需避免畫面 crash，並顯示安全的資料來源、fallback 與空狀態提示。
 - 第二十八階段開始統一處理使用者座標距離排序。HomePage 與 ParkingPage 都會在取得使用者座標後，將資料依距離由近到遠排序；沒有座標的資料會保留顯示並排在後面。
 - 第二十九階段後，API adapter 接收 `/api/parking` 合併後資料；前端仍只透過 `parkingService` 與 `/api/parking`，不直接呼叫 TDX。
-- 第三十階段開始移除僅顯示 20 筆的限制。ParkingPage 會保留所有符合條件的資料，並在畫面層以每頁 12 張卡片分頁顯示；搜尋、定位或資料重新載入後會回到第 1 頁。
+- 第三十階段開始移除僅顯示 20 筆的限制。ParkingPage 會以使用者座標為中心，保留 2 公里內符合條件的資料，並在畫面層以每頁 12 張卡片分頁顯示；搜尋、定位或資料重新載入後會回到第 1 頁。
 - Production 若要啟用 API mode，需設定公開前端變數 `VITE_PARKING_DATA_SOURCE=api`；未設定時預設仍使用 mock adapter。
 - 在 Vercel Preview 驗證 `/api/parking?city=Taipei` 成功後，再測試 `VITE_PARKING_DATA_SOURCE=api`。
 - 補齊 `/api/parking` 對 keyword / city / district 的查詢策略。
