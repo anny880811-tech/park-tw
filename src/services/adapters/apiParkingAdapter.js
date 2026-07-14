@@ -1,6 +1,6 @@
 const DEFAULT_API_CITY = 'Taichung'
-let cachedParkingResult = null
-let pendingParkingRequest = null
+const cachedParkingResults = new Map()
+const pendingParkingRequests = new Map()
 
 const filterParkingLotsByKeyword = (parkingLots = [], keyword = '') => {
   const normalizedKeyword = keyword.trim().toLowerCase()
@@ -40,18 +40,26 @@ const fetchParking = async (params) => {
   return result
 }
 
-const fetchDefaultCityParking = async ({ latitude, longitude } = {}) => {
-  if (cachedParkingResult) {
-    return cachedParkingResult
+const getSafeCity = (city) => {
+  return typeof city === 'string' && city.trim()
+    ? city.trim()
+    : DEFAULT_API_CITY
+}
+
+const fetchDefaultCityParking = async ({ city, latitude, longitude } = {}) => {
+  const safeCity = getSafeCity(city)
+
+  if (cachedParkingResults.has(safeCity)) {
+    return cachedParkingResults.get(safeCity)
   }
 
-  if (pendingParkingRequest) {
-    return pendingParkingRequest
+  if (pendingParkingRequests.has(safeCity)) {
+    return pendingParkingRequests.get(safeCity)
   }
 
   const params = new URLSearchParams()
 
-  params.set('city', DEFAULT_API_CITY)
+  params.set('city', safeCity)
 
   if (Number.isFinite(latitude)) {
     params.set('latitude', latitude)
@@ -61,29 +69,32 @@ const fetchDefaultCityParking = async ({ latitude, longitude } = {}) => {
     params.set('longitude', longitude)
   }
 
-  pendingParkingRequest = fetchParking(params)
+  const pendingParkingRequest = fetchParking(params)
     .then((result) => {
-      cachedParkingResult = result
+      cachedParkingResults.set(safeCity, result)
 
       return result
     })
     .finally(() => {
-      pendingParkingRequest = null
+      pendingParkingRequests.delete(safeCity)
     })
+
+  pendingParkingRequests.set(safeCity, pendingParkingRequest)
 
   return pendingParkingRequest
 }
 
-export const getNearbyParkingFromApi = async ({ latitude, longitude } = {}) => {
-  return fetchDefaultCityParking({ latitude, longitude })
+export const getNearbyParkingFromApi = async ({ city, latitude, longitude } = {}) => {
+  return fetchDefaultCityParking({ city, latitude, longitude })
 }
 
 export const searchParkingLotsFromApi = async ({
   keyword,
+  city,
   latitude,
   longitude,
 } = {}) => {
-  const result = await fetchDefaultCityParking({ latitude, longitude })
+  const result = await fetchDefaultCityParking({ city, latitude, longitude })
 
   return {
     ...result,

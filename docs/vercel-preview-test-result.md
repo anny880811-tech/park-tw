@@ -200,6 +200,13 @@ https://<your-preview-url>/api/parking?city=Taipei
 - HomePage 停車場與路邊停車格分頁彼此獨立。
 - 手機版分頁 UI 以同一行呈現上一頁、頁碼、頁碼下拉選單與下一頁。
 
+第三十三階段：測試地標 city 對應。
+
+- 測試地標需同時包含 `latitude`、`longitude` 與 `city`。
+- 選擇台北 101 時，前端會以 `city=Taipei` 呼叫 `/api/parking`。
+- 選擇台中車站時，前端會以 `city=Taichung` 呼叫 `/api/parking`。
+- 前端再以地標座標篩選 2 公里內資料。
+
 ## 9. 結論
 
 ```text

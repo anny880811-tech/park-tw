@@ -98,8 +98,8 @@ const fallbackToMock = async (mockRequest, meta) => {
   return withMeta(result, meta)
 }
 
-export const getNearbyParking = async ({ latitude, longitude } = {}) => {
-  const params = { latitude, longitude }
+export const getNearbyParking = async ({ city, latitude, longitude } = {}) => {
+  const params = { city, latitude, longitude }
   const position = params
 
   if (getParkingDataSource() !== PARKING_DATA_SOURCES.API) {
@@ -130,8 +130,8 @@ export const getNearbyParking = async ({ latitude, longitude } = {}) => {
   }
 }
 
-export const searchParkingLots = async ({ keyword, latitude, longitude } = {}) => {
-  const params = { latitude, longitude }
+export const searchParkingLots = async ({ city, keyword, latitude, longitude } = {}) => {
+  const params = { city, latitude, longitude }
   const position = { latitude, longitude }
 
   if (getParkingDataSource() !== PARKING_DATA_SOURCES.API) {

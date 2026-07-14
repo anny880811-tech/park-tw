@@ -12,6 +12,7 @@ import {
   MAX_PARKING_RESULTS,
   PARKING_PAGE_SIZE,
 } from '../constants/pagination.js'
+import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
 import { getNearbyParking } from '../services/parkingService.js'
 
 const getLatestUpdatedAt = (items = []) => {
@@ -23,6 +24,7 @@ const HomePage = () => {
   const [currentStreetParkingPage, setCurrentStreetParkingPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
+  const [selectedLandmark, setSelectedLandmark] = useState(null)
   const [dataError, setDataError] = useState('')
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [parkingMeta, setParkingMeta] = useState(null)
@@ -33,7 +35,9 @@ const HomePage = () => {
     getCurrentLocation,
   } = useGeolocation()
   const isLoading = status === 'loading'
-  const canSortByPosition = status === 'success' && position
+  const activePosition = selectedLandmark || (status === 'success' ? position : null)
+  const activeCity = selectedLandmark?.city
+  const canSortByPosition = Boolean(activePosition)
 
   useEffect(() => {
     let isActive = true
@@ -43,10 +47,11 @@ const HomePage = () => {
       setDataError('')
 
       try {
-        const locationParams = canSortByPosition
+        const locationParams = activePosition
           ? {
-              latitude: position.latitude,
-              longitude: position.longitude,
+              city: activeCity,
+              latitude: activePosition.latitude,
+              longitude: activePosition.longitude,
             }
           : undefined
         const result = await getNearbyParking(locationParams)
@@ -77,7 +82,7 @@ const HomePage = () => {
     return () => {
       isActive = false
     }
-  }, [canSortByPosition, position])
+  }, [activeCity, activePosition])
   const updatedAt = getLatestUpdatedAt(parkingLots)
   const hasNearbyParkingData = parkingLots.length > 0 || streetParkingSpaces.length > 0
   const isApiDataSource = parkingMeta?.dataSource === 'api'
@@ -125,12 +130,26 @@ const HomePage = () => {
               <Button
                 className="home-hero__button"
                 disabled={isLoading}
-                onClick={getCurrentLocation}
+                onClick={() => {
+                  setSelectedLandmark(null)
+                  getCurrentLocation()
+                }}
                 variant="primary"
               >
                 {isLoading ? '定位中...' : '使用目前位置'}
               </Button>
               <small>定位成功後會顯示 2 公里內停車資料。</small>
+            </div>
+            <div className="d-flex flex-wrap gap-2 mt-3">
+              {TEST_LANDMARKS.map((landmark) => (
+                <Button
+                  key={landmark.id}
+                  onClick={() => setSelectedLandmark(landmark)}
+                  variant={selectedLandmark?.id === landmark.id ? 'secondary' : 'outline'}
+                >
+                  {landmark.name}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
@@ -153,7 +172,7 @@ const HomePage = () => {
           </Badge>
           <p className="mb-0">
             {canSortByPosition
-              ? '已依目前位置篩選 2 公里內停車場，並由近到遠排序。'
+              ? `已依${selectedLandmark ? selectedLandmark.name : '目前位置'}篩選 2 公里內停車場，並由近到遠排序。`
               : '尚未取得位置，先顯示預設停車資料。'}
           </p>
         </div>

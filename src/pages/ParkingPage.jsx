@@ -14,6 +14,7 @@ import {
   MAX_PARKING_RESULTS,
   PARKING_PAGE_SIZE,
 } from '../constants/pagination.js'
+import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
 
 const getLatestUpdatedAt = (items = []) => {
   return items.find((item) => item.updatedAt)?.updatedAt || ''
@@ -44,6 +45,7 @@ const ParkingPage = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
   const [parkingMeta, setParkingMeta] = useState(null)
+  const [selectedLandmark, setSelectedLandmark] = useState(null)
   const {
     status: locationStatus,
     position,
@@ -51,7 +53,9 @@ const ParkingPage = () => {
     getCurrentLocation,
   } = useGeolocation()
   const isLocationLoading = locationStatus === 'loading'
-  const canSortByPosition = locationStatus === 'success' && position
+  const activePosition = selectedLandmark || (locationStatus === 'success' ? position : null)
+  const activeCity = selectedLandmark?.city
+  const canSortByPosition = Boolean(activePosition)
   const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
   const pagedParkingLots = filteredParkingLots.slice(0, MAX_PARKING_RESULTS)
   const hasResults = filteredParkingLots.length > 0
@@ -76,10 +80,11 @@ const ParkingPage = () => {
       setDataError('')
 
       try {
-        const locationParams = canSortByPosition
+        const locationParams = activePosition
           ? {
-              latitude: position.latitude,
-              longitude: position.longitude,
+              city: activeCity,
+              latitude: activePosition.latitude,
+              longitude: activePosition.longitude,
             }
           : undefined
         const result = await searchParkingLots(locationParams)
@@ -107,7 +112,7 @@ const ParkingPage = () => {
     return () => {
       isActive = false
     }
-  }, [canSortByPosition, position])
+  }, [activeCity, activePosition])
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
@@ -164,7 +169,10 @@ const ParkingPage = () => {
               </span>
               <Button
                 disabled={isLocationLoading}
-                onClick={getCurrentLocation}
+                onClick={() => {
+                  setSelectedLandmark(null)
+                  getCurrentLocation()
+                }}
                 variant="outline"
               >
                 {isLocationLoading ? '定位中...' : '使用目前位置排序'}
@@ -178,6 +186,20 @@ const ParkingPage = () => {
                   清除搜尋
                 </Button>
               )}
+            </div>
+            <div className="d-flex flex-wrap gap-2">
+              {TEST_LANDMARKS.map((landmark) => (
+                <Button
+                  key={landmark.id}
+                  onClick={() => {
+                    setSelectedLandmark(landmark)
+                    setCurrentPage(1)
+                  }}
+                  variant={selectedLandmark?.id === landmark.id ? 'secondary' : 'outline'}
+                >
+                  {landmark.name}
+                </Button>
+              ))}
             </div>
           </div>
         </Card>
@@ -194,7 +216,7 @@ const ParkingPage = () => {
           </Badge>
           <p className="mb-0">
             {canSortByPosition
-              ? '已篩選你目前位置 2 公里內的停車場，並由近到遠排序。'
+              ? `已篩選${selectedLandmark ? selectedLandmark.name : '你目前位置'} 2 公里內的停車場，並由近到遠排序。`
               : '尚未取得位置，顯示預設排序；取得定位後會顯示 2 公里內資料。'}
           </p>
         </div>
