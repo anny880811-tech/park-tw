@@ -11,12 +11,31 @@ const getLatestUpdatedAt = (items = []) => {
   return items.find((item) => item.updatedAt)?.updatedAt || ''
 }
 
+const filterParkingLotsByKeyword = (parkingLots = [], keyword = '') => {
+  const normalizedKeyword = keyword.trim().toLowerCase()
+
+  if (!normalizedKeyword) {
+    return parkingLots
+  }
+
+  return parkingLots.filter((item) => {
+    const searchableText = [
+      item.name,
+      item.address,
+      item.district,
+    ].filter(Boolean).join(' ').toLowerCase()
+
+    return searchableText.includes(normalizedKeyword)
+  })
+}
+
 const ParkingPage = () => {
   const [keyword, setKeyword] = useState('')
   const [dataError, setDataError] = useState('')
-  const [filteredParkingLots, setFilteredParkingLots] = useState([])
   const [isDataLoading, setIsDataLoading] = useState(true)
+  const [parkingLots, setParkingLots] = useState([])
   const [parkingMeta, setParkingMeta] = useState(null)
+  const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
   const hasResults = filteredParkingLots.length > 0
 
   useEffect(() => {
@@ -27,15 +46,15 @@ const ParkingPage = () => {
       setDataError('')
 
       try {
-        const result = await searchParkingLots({ keyword })
+        const result = await searchParkingLots()
 
         if (isActive) {
-          setFilteredParkingLots(result.parkingLots)
+          setParkingLots(result.parkingLots)
           setParkingMeta(result.meta)
         }
       } catch {
         if (isActive) {
-          setFilteredParkingLots([])
+          setParkingLots([])
           setParkingMeta(null)
           setDataError('目前無法取得停車資料，請稍後再試。')
         }
@@ -51,7 +70,7 @@ const ParkingPage = () => {
     return () => {
       isActive = false
     }
-  }, [keyword])
+  }, [])
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
