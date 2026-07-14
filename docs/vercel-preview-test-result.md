@@ -168,6 +168,13 @@ https://<your-preview-url>/api/parking?city=Taipei
 - 確認 response 不包含 token、secret 或 Authorization header。
 - 確認 HomePage / ParkingPage API mode 不 crash。
 
+第三十階段：完整結果顯示與 ParkingPage 分頁。
+
+- `/api/parking?city=Taichung` 不再使用 `$top=20` 測試限制。
+- ParkingPage 保留所有符合條件的資料，並以每頁 12 張卡片顯示。
+- 搜尋、定位或資料重新載入後，分頁會回到第 1 頁。
+- 分頁只在畫面層處理，不會因切換頁碼重新呼叫 TDX API。
+
 ## 9. 結論
 
 ```text

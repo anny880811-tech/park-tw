@@ -50,7 +50,7 @@ https://<your-preview-url>/api/parking
 https://<your-preview-url>/api/parking?city=Taipei
 ```
 
-目前 `/api/parking` 預設 city 為 `Taipei`，並限制 TDX query 使用 `$top=20` 與 `$format=JSON`。
+目前 `/api/parking` 會使用指定 city query 測試 TDX city endpoint，並使用 `$format=JSON` 取得 JSON；第三十階段起不再使用 `$top=20` 測試限制。
 
 ## 5. 成功回應範例
 

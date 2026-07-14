@@ -29,6 +29,7 @@ https://park-tw.vercel.app/
 
 - 首頁停車資訊展示。
 - 停車場搜尋頁。
+- 停車場搜尋結果完整保留，並以每頁 12 張卡片分頁顯示。
 - 使用者定位 UI 與狀態處理。
 - mock data 模式。
 - API mode。

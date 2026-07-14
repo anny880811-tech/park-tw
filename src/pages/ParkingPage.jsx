@@ -4,10 +4,13 @@ import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
 import DataStatusNotice from '../components/ui/DataStatusNotice.jsx'
+import Pagination from '../components/ui/Pagination.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
 import LocationStatus from '../components/location/LocationStatus.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
 import { searchParkingLots } from '../services/parkingService.js'
+
+const PARKING_PAGE_SIZE = 12
 
 const getLatestUpdatedAt = (items = []) => {
   return items.find((item) => item.updatedAt)?.updatedAt || ''
@@ -35,6 +38,7 @@ const ParkingPage = () => {
   const [keyword, setKeyword] = useState('')
   const [dataError, setDataError] = useState('')
   const [isDataLoading, setIsDataLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
   const [parkingMeta, setParkingMeta] = useState(null)
   const {
@@ -47,6 +51,15 @@ const ParkingPage = () => {
   const canSortByPosition = locationStatus === 'success' && position
   const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
   const hasResults = filteredParkingLots.length > 0
+  const totalPages = Math.ceil(filteredParkingLots.length / PARKING_PAGE_SIZE)
+  const safeCurrentPage = totalPages > 0
+    ? Math.min(currentPage, totalPages)
+    : 1
+  const startIndex = (safeCurrentPage - 1) * PARKING_PAGE_SIZE
+  const visibleParkingLots = filteredParkingLots.slice(
+    startIndex,
+    startIndex + PARKING_PAGE_SIZE,
+  )
 
   useEffect(() => {
     let isActive = true
@@ -67,6 +80,7 @@ const ParkingPage = () => {
         if (isActive) {
           setParkingLots(result.parkingLots)
           setParkingMeta(result.meta)
+          setCurrentPage(1)
         }
       } catch {
         if (isActive) {
@@ -90,14 +104,17 @@ const ParkingPage = () => {
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
+    setCurrentPage(1)
   }
 
   const handleSearchSubmit = () => {
     setKeyword((currentKeyword) => currentKeyword.trim())
+    setCurrentPage(1)
   }
 
   const handleClearKeyword = () => {
     setKeyword('')
+    setCurrentPage(1)
   }
   const updatedAt = getLatestUpdatedAt(filteredParkingLots)
 
@@ -133,7 +150,8 @@ const ParkingPage = () => {
             />
             <div className="parking-search-panel__meta">
               <span>
-                顯示 {filteredParkingLots.length} 筆停車場
+                共找到 {filteredParkingLots.length} 筆符合條件的停車場
+                {hasResults ? `，第 ${safeCurrentPage} / ${totalPages} 頁` : ''}
               </span>
               <Button
                 disabled={isLocationLoading}
@@ -196,12 +214,18 @@ const ParkingPage = () => {
               </p>
             </div>
             <div className="row g-4">
-              {filteredParkingLots.map((item) => (
+              {visibleParkingLots.map((item) => (
                 <div className="col-12 col-md-6 col-xl-4" key={item.id}>
                   <ParkingInfoCard item={item} />
                 </div>
               ))}
             </div>
+            <Pagination
+              className="mt-4"
+              currentPage={safeCurrentPage}
+              onPageChange={setCurrentPage}
+              totalPages={totalPages}
+            />
           </section>
         ) : (
           <Card className="empty-state">

@@ -30,7 +30,6 @@ const getCity = (request) => {
 
 const buildTdxParkingUrl = (endpoint, city) => {
   const params = new URLSearchParams({
-    $top: '20',
     $format: 'JSON',
   })
 

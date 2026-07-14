@@ -292,3 +292,5 @@ TDX_CLIENT_SECRET
 
 本階段不建立 Vercel Function、不建立 `/api` 資料夾、不建立 `.env`、不填入任何金鑰。上述內容只作為未來正式 API 串接時的安全架構建議。
 
+第三十階段移除 `/api/parking` 的 `$top=20` 測試限制，讓 city endpoint 回傳的符合資料可完整保留。ParkingPage 會在搜尋、定位與距離排序完成後，於畫面層以每頁 12 張卡片分頁顯示。
+

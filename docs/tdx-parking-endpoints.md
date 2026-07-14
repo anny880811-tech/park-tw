@@ -30,7 +30,7 @@
 | endpoint 名稱 | 路外停車場基本資料，正式名稱待確認 |
 | endpoint path | `/api/basic/v1/Parking/OffStreet/CarPark/City/{city}` |
 | 是否支援指定縣市 | 是，第十七階段以 `Taipei` 測試 |
-| 是否支援 OData query | 第十七階段已使用 `$top=20` 與 `$format=JSON` |
+| 是否支援 OData query | 第十七階段曾以 `$top=20` 與 `$format=JSON` 測試；第三十階段起移除 `$top=20`，保留 `$format=JSON` |
 | 是否包含停車場 ID | 是，已確認 `CarParkID` |
 | 是否包含停車場名稱 | 是，已確認 `CarParkName.Zh_tw` |
 | 是否包含地址 | 是，已確認 `Address` |
@@ -229,7 +229,7 @@ TDX API 常見可能支援 OData query，但停車 API 實際支援範圍需以 
 
 1. `/api/parking?city=Taipei` 由 Vercel Function 取得 server-side access token。
 2. 呼叫 `Parking/OffStreet/CarPark/City/{city}`。
-3. 使用 `$top=20` 限制筆數，使用 `$format=JSON` 取得 JSON。
+3. 使用 `$format=JSON` 取得 JSON；第三十階段起不再使用 `$top=20` 測試限制，避免只回傳前 20 筆。
 4. 使用 `server/tdxParkingMapper.js` normalize。
 5. 讓 `/api/parking` 回傳內部格式。
 6. 前端仍預設使用 mock adapter，尚未正式替換 HomePage / ParkingPage 資料來源。

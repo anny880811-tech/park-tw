@@ -50,6 +50,11 @@ VITE_PARKING_DATA_SOURCE=api
 - `parkingLots` 不包含 token、secret 或 Authorization header。
 - HomePage API mode 可用合併後座標進行 1km 篩選。
 - ParkingPage API mode 可用合併後座標進行 1km 篩選。
+- `/parking` 不只顯示前 20 筆。
+- `/parking` 符合條件資料會以每頁 12 張卡片分頁。
+- 搜尋後分頁會回到第 1 頁。
+- 定位或資料重新載入後分頁不會錯亂。
+- 第 1 頁是目前排序後的前 12 筆。
 - 確認 response 不包含 token、secret 或 Authorization header。
 
 ## 5. Production 部署前人工確認
