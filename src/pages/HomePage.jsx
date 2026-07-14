@@ -7,7 +7,11 @@ import Card from '../components/ui/Card.jsx'
 import DataStatusNotice from '../components/ui/DataStatusNotice.jsx'
 import Pagination from '../components/ui/Pagination.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
-import { PARKING_PAGE_SIZE } from '../constants/pagination.js'
+import {
+  MAX_PARKING_PAGES,
+  MAX_PARKING_RESULTS,
+  PARKING_PAGE_SIZE,
+} from '../constants/pagination.js'
 import { getNearbyParking } from '../services/parkingService.js'
 
 const getLatestUpdatedAt = (items = []) => {
@@ -16,6 +20,7 @@ const getLatestUpdatedAt = (items = []) => {
 
 const HomePage = () => {
   const [currentParkingLotPage, setCurrentParkingLotPage] = useState(1)
+  const [currentStreetParkingPage, setCurrentStreetParkingPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
   const [dataError, setDataError] = useState('')
@@ -51,6 +56,7 @@ const HomePage = () => {
           setStreetParkingSpaces(result.streetParkingSpaces)
           setParkingMeta(result.meta)
           setCurrentParkingLotPage(1)
+          setCurrentStreetParkingPage(1)
         }
       } catch {
         if (isActive) {
@@ -75,14 +81,31 @@ const HomePage = () => {
   const updatedAt = getLatestUpdatedAt(parkingLots)
   const hasNearbyParkingData = parkingLots.length > 0 || streetParkingSpaces.length > 0
   const isApiDataSource = parkingMeta?.dataSource === 'api'
-  const totalParkingLotPages = Math.ceil(parkingLots.length / PARKING_PAGE_SIZE)
+  const pagedParkingLots = parkingLots.slice(0, MAX_PARKING_RESULTS)
+  const pagedStreetParkingSpaces = streetParkingSpaces.slice(0, MAX_PARKING_RESULTS)
+  const totalParkingLotPages = Math.min(
+    Math.ceil(pagedParkingLots.length / PARKING_PAGE_SIZE),
+    MAX_PARKING_PAGES,
+  )
+  const totalStreetParkingPages = Math.min(
+    Math.ceil(pagedStreetParkingSpaces.length / PARKING_PAGE_SIZE),
+    MAX_PARKING_PAGES,
+  )
   const safeParkingLotPage = totalParkingLotPages > 0
     ? Math.min(currentParkingLotPage, totalParkingLotPages)
     : 1
+  const safeStreetParkingPage = totalStreetParkingPages > 0
+    ? Math.min(currentStreetParkingPage, totalStreetParkingPages)
+    : 1
   const parkingLotStartIndex = (safeParkingLotPage - 1) * PARKING_PAGE_SIZE
-  const visibleParkingLots = parkingLots.slice(
+  const streetParkingStartIndex = (safeStreetParkingPage - 1) * PARKING_PAGE_SIZE
+  const visibleParkingLots = pagedParkingLots.slice(
     parkingLotStartIndex,
     parkingLotStartIndex + PARKING_PAGE_SIZE,
+  )
+  const visibleStreetParkingSpaces = pagedStreetParkingSpaces.slice(
+    streetParkingStartIndex,
+    streetParkingStartIndex + PARKING_PAGE_SIZE,
   )
 
   return (
@@ -148,7 +171,7 @@ const HomePage = () => {
             <NearbyParkingSection
               description={
                 canSortByPosition
-                  ? `共找到 ${parkingLots.length} 筆 2 公里內停車場，第 ${safeParkingLotPage} / ${totalParkingLotPages} 頁。`
+                  ? `共顯示 ${pagedParkingLots.length} 筆以內的 2 公里內停車場，第 ${safeParkingLotPage} / ${totalParkingLotPages} 頁。`
                   : '顯示目前位置附近的路外停車場、剩餘車位與收費資訊；定位後會顯示 2 公里內資料。'
               }
               items={visibleParkingLots}
@@ -163,15 +186,26 @@ const HomePage = () => {
             </NearbyParkingSection>
 
             <NearbyParkingSection
-              description="顯示目前位置附近的路邊停車格與可用格位。"
+              description={
+                canSortByPosition && pagedStreetParkingSpaces.length > 0
+                  ? `共顯示 ${pagedStreetParkingSpaces.length} 筆以內的 2 公里內路邊停車格，第 ${safeStreetParkingPage} / ${totalStreetParkingPages} 頁。`
+                  : '顯示目前位置附近的路邊停車格與可用格位。'
+              }
               emptyText={
                 isApiDataSource
                   ? '目前尚未取得路邊停車格即時資料。'
                   : '目前 2 公里內沒有可顯示的路邊停車格。'
               }
-              items={streetParkingSpaces}
+              items={visibleStreetParkingSpaces}
               title="附近路邊停車格"
-            />
+            >
+              <Pagination
+                className="mt-4"
+                currentPage={safeStreetParkingPage}
+                onPageChange={setCurrentStreetParkingPage}
+                totalPages={totalStreetParkingPages}
+              />
+            </NearbyParkingSection>
           </>
         )}
       </section>

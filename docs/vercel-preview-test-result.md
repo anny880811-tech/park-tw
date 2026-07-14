@@ -193,6 +193,13 @@ https://<your-preview-url>/api/parking?city=Taipei
 - 若路邊資料取得失敗，`streetParkingSpaces` 會維持空陣列，不影響 `parkingLots`。
 - API response 不應包含 token、secret 或 Authorization header。
 
+第三十二階段：全站分頁上限與手機版分頁 UI。
+
+- HomePage 與 ParkingPage 停車資料列表最多顯示 120 筆。
+- 每頁顯示 12 張卡片，最多 10 頁。
+- HomePage 停車場與路邊停車格分頁彼此獨立。
+- 手機版分頁 UI 以同一行呈現上一頁、頁碼、頁碼下拉選單與下一頁。
+
 ## 9. 結論
 
 ```text

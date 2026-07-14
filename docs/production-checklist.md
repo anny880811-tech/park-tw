@@ -55,6 +55,11 @@ VITE_PARKING_DATA_SOURCE=api
 - 首頁會顯示路邊停車格區塊；mock mode 有資料時顯示卡片，API mode 尚未提供路邊停車格時顯示友善空狀態。
 - `/api/parking?city=Taichung` 回傳 `streetParkingSpaces` 欄位。
 - `streetParkingSpaces` 不包含 token、secret 或 Authorization header。
+- HomePage 停車場最多顯示 120 筆、每頁 12 張、最多 10 頁。
+- HomePage 路邊停車格最多顯示 120 筆、每頁 12 張、最多 10 頁。
+- HomePage 停車場與路邊停車格分頁彼此獨立。
+- `/parking` 搜尋結果最多顯示 120 筆、每頁 12 張、最多 10 頁。
+- 手機版分頁 UI 維持同一行，並提供頁碼下拉選單。
 - `/parking` 不只顯示前 20 筆。
 - `/parking` 以使用者座標為中心，顯示 2 公里內符合條件的停車場，並以每頁 12 張卡片分頁。
 - 搜尋後分頁會回到第 1 頁。

@@ -1,17 +1,35 @@
+import { MAX_PARKING_PAGES } from '../../constants/pagination.js'
+
+const getMobilePages = (currentPage, totalPages) => {
+  if (totalPages <= 2) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1)
+  }
+
+  if (currentPage >= totalPages) {
+    return [totalPages - 1, totalPages]
+  }
+
+  return [currentPage, currentPage + 1]
+}
+
 const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
   className = '',
 }) => {
-  if (totalPages <= 1) {
+  const effectiveTotalPages = Math.min(totalPages, MAX_PARKING_PAGES)
+  const effectiveCurrentPage = Math.min(currentPage, effectiveTotalPages)
+
+  if (effectiveTotalPages <= 1) {
     return null
   }
 
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
+  const pages = Array.from({ length: effectiveTotalPages }, (_, index) => index + 1)
+  const mobilePages = getMobilePages(effectiveCurrentPage, effectiveTotalPages)
 
   const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages || page === currentPage) {
+    if (page < 1 || page > effectiveTotalPages || page === effectiveCurrentPage) {
       return
     }
 
@@ -23,13 +41,63 @@ const Pagination = ({
       aria-label="停車場列表分頁"
       className={className}
     >
-      <ul className="pagination justify-content-center mb-0 flex-wrap gap-1">
-        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+      <div className="d-flex d-md-none align-items-center justify-content-center gap-1 flex-nowrap">
+        <button
+          aria-label="上一頁"
+          className="btn btn-outline-secondary btn-sm flex-shrink-0"
+          disabled={effectiveCurrentPage === 1}
+          onClick={() => handlePageChange(effectiveCurrentPage - 1)}
+          type="button"
+        >
+          上一頁
+        </button>
+
+        {mobilePages.map((page) => (
+          <button
+            aria-current={page === currentPage ? 'page' : undefined}
+            aria-label={`第 ${page} 頁`}
+            className={`btn btn-sm flex-shrink-0 ${
+              page === effectiveCurrentPage ? 'btn-primary' : 'btn-outline-secondary'
+            }`}
+            key={page}
+            onClick={() => handlePageChange(page)}
+            type="button"
+          >
+            {page}
+          </button>
+        ))}
+
+        <select
+          aria-label="選擇頁碼"
+          className="form-select form-select-sm w-auto flex-shrink-1"
+          onChange={(event) => handlePageChange(Number(event.target.value))}
+          value={effectiveCurrentPage}
+        >
+          {pages.map((page) => (
+            <option key={page} value={page}>
+              第 {page} / {effectiveTotalPages} 頁
+            </option>
+          ))}
+        </select>
+
+        <button
+          aria-label="下一頁"
+          className="btn btn-outline-secondary btn-sm flex-shrink-0"
+          disabled={effectiveCurrentPage === effectiveTotalPages}
+          onClick={() => handlePageChange(effectiveCurrentPage + 1)}
+          type="button"
+        >
+          下一頁
+        </button>
+      </div>
+
+      <ul className="pagination justify-content-center mb-0 gap-1 d-none d-md-flex">
+        <li className={`page-item ${effectiveCurrentPage === 1 ? 'disabled' : ''}`}>
           <button
             aria-label="上一頁"
             className="page-link"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={effectiveCurrentPage === 1}
+            onClick={() => handlePageChange(effectiveCurrentPage - 1)}
             type="button"
           >
             上一頁
@@ -38,11 +106,11 @@ const Pagination = ({
 
         {pages.map((page) => (
           <li
-            className={`page-item ${page === currentPage ? 'active' : ''}`}
+            className={`page-item ${page === effectiveCurrentPage ? 'active' : ''}`}
             key={page}
           >
             <button
-              aria-current={page === currentPage ? 'page' : undefined}
+              aria-current={page === effectiveCurrentPage ? 'page' : undefined}
               aria-label={`第 ${page} 頁`}
               className="page-link"
               onClick={() => handlePageChange(page)}
@@ -53,12 +121,12 @@ const Pagination = ({
           </li>
         ))}
 
-        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+        <li className={`page-item ${effectiveCurrentPage === effectiveTotalPages ? 'disabled' : ''}`}>
           <button
             aria-label="下一頁"
             className="page-link"
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={effectiveCurrentPage === effectiveTotalPages}
+            onClick={() => handlePageChange(effectiveCurrentPage + 1)}
             type="button"
           >
             下一頁

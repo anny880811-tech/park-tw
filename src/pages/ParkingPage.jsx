@@ -9,7 +9,11 @@ import SearchBar from '../components/ui/SearchBar.jsx'
 import LocationStatus from '../components/location/LocationStatus.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
 import { searchParkingLots } from '../services/parkingService.js'
-import { PARKING_PAGE_SIZE } from '../constants/pagination.js'
+import {
+  MAX_PARKING_PAGES,
+  MAX_PARKING_RESULTS,
+  PARKING_PAGE_SIZE,
+} from '../constants/pagination.js'
 
 const getLatestUpdatedAt = (items = []) => {
   return items.find((item) => item.updatedAt)?.updatedAt || ''
@@ -49,13 +53,17 @@ const ParkingPage = () => {
   const isLocationLoading = locationStatus === 'loading'
   const canSortByPosition = locationStatus === 'success' && position
   const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
+  const pagedParkingLots = filteredParkingLots.slice(0, MAX_PARKING_RESULTS)
   const hasResults = filteredParkingLots.length > 0
-  const totalPages = Math.ceil(filteredParkingLots.length / PARKING_PAGE_SIZE)
+  const totalPages = Math.min(
+    Math.ceil(pagedParkingLots.length / PARKING_PAGE_SIZE),
+    MAX_PARKING_PAGES,
+  )
   const safeCurrentPage = totalPages > 0
     ? Math.min(currentPage, totalPages)
     : 1
   const startIndex = (safeCurrentPage - 1) * PARKING_PAGE_SIZE
-  const visibleParkingLots = filteredParkingLots.slice(
+  const visibleParkingLots = pagedParkingLots.slice(
     startIndex,
     startIndex + PARKING_PAGE_SIZE,
   )
@@ -149,7 +157,7 @@ const ParkingPage = () => {
             />
             <div className="parking-search-panel__meta">
               <span>
-                共找到 {filteredParkingLots.length} 筆
+                共顯示 {pagedParkingLots.length} 筆以內的
                 {canSortByPosition ? ' 2 公里內' : ''}
                 符合條件的停車場
                 {hasResults ? `，第 ${safeCurrentPage} / ${totalPages} 頁` : ''}
