@@ -202,6 +202,8 @@ TDX API 常見可能支援 OData query，但停車 API 實際支援範圍需以 
 
 ## 9. endpoint 使用策略
 
+第二十九階段開始同時使用 CarPark 基本資料與 ParkingAvailability 即時剩餘車位資料。以 `CarParkID` 合併，CarPark 提供位置與地址，ParkingAvailability 提供剩餘車位與更新時間。
+
 ### 首頁附近停車
 
 1. 使用使用者經緯度判斷所在縣市或附近縣市。

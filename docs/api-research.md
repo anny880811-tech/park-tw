@@ -211,6 +211,10 @@ VITE_TDX_CLIENT_SECRET
 
 第二十六階段進行正式部署前檢查。確認前端仍透過 `parkingService` 與 `/api/parking` 取得資料，不直接呼叫 TDX，也不保存 token 或 secret。
 
+第二十八階段開始統一處理使用者座標距離排序。若 API 回傳資料沒有 `latitude` / `longitude`，前端無法進行精準距離排序；後續需合併 TDX CarPark 基本資料與 ParkingAvailability 即時車位資料，才能在 API mode 下完整支援由近到遠排序。
+
+第二十九階段讓 `/api/parking` 合併 TDX CarPark 基本資料與 ParkingAvailability 即時剩餘車位資料。API mode 若要支援 1km 範圍篩選與距離排序，需要停車場經緯度，因此由 CarPark 提供位置與地址，再以 ParkingAvailability 補足剩餘車位、服務狀態與更新時間。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text

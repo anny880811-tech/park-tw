@@ -42,6 +42,14 @@ VITE_PARKING_DATA_SOURCE=api
 - 測試 `/api/parking?city=Taichung` 可回傳安全 response。
 - 測試 `/` 可顯示 API mode 或 fallback 狀態。
 - 測試 `/parking` 可顯示 API mode 或 fallback 狀態。
+- 首頁定位成功後，停車場依距離由近到遠排序。
+- `/parking` 定位成功後，搜尋結果依距離由近到遠排序。
+- 定位失敗時頁面仍正常顯示。
+- 沒有座標的資料不會造成畫面錯誤。
+- `/api/parking?city=Taichung` 回傳 `parkingLots` 並包含 `latitude` / `longitude`。
+- `parkingLots` 不包含 token、secret 或 Authorization header。
+- HomePage API mode 可用合併後座標進行 1km 篩選。
+- ParkingPage API mode 可用合併後座標進行 1km 篩選。
 - 確認 response 不包含 token、secret 或 Authorization header。
 
 ## 5. Production 部署前人工確認

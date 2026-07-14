@@ -5,6 +5,8 @@ import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
 import DataStatusNotice from '../components/ui/DataStatusNotice.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
+import LocationStatus from '../components/location/LocationStatus.jsx'
+import useGeolocation from '../hooks/useGeolocation.js'
 import { searchParkingLots } from '../services/parkingService.js'
 
 const getLatestUpdatedAt = (items = []) => {
@@ -35,6 +37,14 @@ const ParkingPage = () => {
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [parkingLots, setParkingLots] = useState([])
   const [parkingMeta, setParkingMeta] = useState(null)
+  const {
+    status: locationStatus,
+    position,
+    error: locationError,
+    getCurrentLocation,
+  } = useGeolocation()
+  const isLocationLoading = locationStatus === 'loading'
+  const canSortByPosition = locationStatus === 'success' && position
   const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
   const hasResults = filteredParkingLots.length > 0
 
@@ -46,7 +56,13 @@ const ParkingPage = () => {
       setDataError('')
 
       try {
-        const result = await searchParkingLots()
+        const locationParams = canSortByPosition
+          ? {
+              latitude: position.latitude,
+              longitude: position.longitude,
+            }
+          : undefined
+        const result = await searchParkingLots(locationParams)
 
         if (isActive) {
           setParkingLots(result.parkingLots)
@@ -70,7 +86,7 @@ const ParkingPage = () => {
     return () => {
       isActive = false
     }
-  }, [])
+  }, [canSortByPosition, position])
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
@@ -119,6 +135,13 @@ const ParkingPage = () => {
               <span>
                 顯示 {filteredParkingLots.length} 筆停車場
               </span>
+              <Button
+                disabled={isLocationLoading}
+                onClick={getCurrentLocation}
+                variant="outline"
+              >
+                {isLocationLoading ? '定位中...' : '使用目前位置排序'}
+              </Button>
               {keyword && (
                 <Button
                   className="parking-search-panel__clear"
@@ -131,6 +154,23 @@ const ParkingPage = () => {
             </div>
           </div>
         </Card>
+
+        <LocationStatus
+          error={locationError}
+          position={position}
+          status={locationStatus}
+        />
+
+        <div className="mock-data-notice">
+          <Badge variant={canSortByPosition ? 'success' : 'secondary'}>
+            {canSortByPosition ? '距離排序' : '預設排序'}
+          </Badge>
+          <p className="mb-0">
+            {canSortByPosition
+              ? '已依你的目前位置由近到遠排序。'
+              : '尚未取得位置，顯示預設排序。'}
+          </p>
+        </div>
 
         <div className="mock-data-notice">
           <Badge variant="secondary">Mock Data</Badge>

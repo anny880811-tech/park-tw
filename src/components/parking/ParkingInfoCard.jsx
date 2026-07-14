@@ -17,20 +17,26 @@ const ParkingInfoCard = ({ item }) => {
     isOpen,
     features = [],
   } = item
-  const hasSpaces = availableSpaces > 0
+  const hasAvailableSpaces = Number.isFinite(availableSpaces)
+  const hasSpaces = hasAvailableSpaces && availableSpaces > 0
+  const hasOpenStatus = typeof isOpen === 'boolean'
   const locationText = address || road
   const openStatus = isOpen === false ? '未營業' : '營業中'
-  const distanceText = displayDistance || formatDistance(distance)
+  const distanceText = displayDistance || (
+    Number.isFinite(distance) ? formatDistance(distance) : ''
+  )
 
   return (
     <Card className="parking-card" subtitle={locationText} title={name}>
       <div className="parking-card__badges">
-        <Badge variant={hasSpaces ? 'success' : 'danger'}>
-          {hasSpaces ? '尚有車位' : '已滿'}
+        <Badge variant={hasAvailableSpaces ? (hasSpaces ? 'success' : 'danger') : 'secondary'}>
+          {hasAvailableSpaces ? (hasSpaces ? '尚有車位' : '已滿') : '車位未知'}
         </Badge>
-        <Badge variant={isOpen === false ? 'secondary' : 'primary'}>
-          {openStatus}
-        </Badge>
+        {hasOpenStatus && (
+          <Badge variant={isOpen === false ? 'secondary' : 'primary'}>
+            {openStatus}
+          </Badge>
+        )}
         {features.map((feature) => (
           <Badge key={feature} variant="secondary">
             {feature}
@@ -49,15 +55,17 @@ const ParkingInfoCard = ({ item }) => {
           <dt>類型</dt>
           <dd>{type}</dd>
         </div>
-        <div>
-          <dt>距離</dt>
-          <dd>{distanceText}</dd>
-        </div>
+        {distanceText && (
+          <div>
+            <dt>距離</dt>
+            <dd>{distanceText}</dd>
+          </div>
+        )}
         <div>
           <dt>剩餘車位</dt>
           <dd>
-            {availableSpaces}
-            {typeof totalSpaces === 'number' && ` / ${totalSpaces}`}
+            {hasAvailableSpaces ? availableSpaces : '資料未提供'}
+            {hasAvailableSpaces && typeof totalSpaces === 'number' && ` / ${totalSpaces}`}
           </dd>
         </div>
         <div>

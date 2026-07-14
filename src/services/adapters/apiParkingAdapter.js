@@ -31,14 +31,16 @@ const fetchParking = async (params) => {
 
   const result = await response.json()
 
-  if (result.meta?.mode && result.meta.mode !== 'minimal-api-integration') {
+  const usableModes = ['minimal-api-integration', 'proxy']
+
+  if (result.meta?.mode && !usableModes.includes(result.meta.mode)) {
     throw new Error('Parking API did not return usable data.')
   }
 
   return result
 }
 
-const fetchDefaultCityParking = async () => {
+const fetchDefaultCityParking = async ({ latitude, longitude } = {}) => {
   if (cachedParkingResult) {
     return cachedParkingResult
   }
@@ -50,6 +52,14 @@ const fetchDefaultCityParking = async () => {
   const params = new URLSearchParams()
 
   params.set('city', DEFAULT_API_CITY)
+
+  if (Number.isFinite(latitude)) {
+    params.set('latitude', latitude)
+  }
+
+  if (Number.isFinite(longitude)) {
+    params.set('longitude', longitude)
+  }
 
   pendingParkingRequest = fetchParking(params)
     .then((result) => {
@@ -64,12 +74,16 @@ const fetchDefaultCityParking = async () => {
   return pendingParkingRequest
 }
 
-export const getNearbyParkingFromApi = async () => {
-  return fetchDefaultCityParking()
+export const getNearbyParkingFromApi = async ({ latitude, longitude } = {}) => {
+  return fetchDefaultCityParking({ latitude, longitude })
 }
 
-export const searchParkingLotsFromApi = async ({ keyword } = {}) => {
-  const result = await fetchDefaultCityParking()
+export const searchParkingLotsFromApi = async ({
+  keyword,
+  latitude,
+  longitude,
+} = {}) => {
+  const result = await fetchDefaultCityParking({ latitude, longitude })
 
   return {
     ...result,

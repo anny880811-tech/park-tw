@@ -161,6 +161,13 @@ https://<your-preview-url>/api/parking?city=Taipei
 - 已新增 Vercel SPA rewrite 設定，避免 React Router 前端路由在直接輸入或重新整理時出現 404。
 - `/api` 路徑排除 rewrite，仍交給 Vercel Function 處理。
 
+第二十九階段：CarPark + ParkingAvailability 合併測試。
+
+- 測試 `/api/parking?city=Taichung` 是否回傳合併後 `parkingLots`。
+- 確認 `parkingLots` 盡可能包含 `latitude` / `longitude` 與 `availableSpaces`。
+- 確認 response 不包含 token、secret 或 Authorization header。
+- 確認 HomePage / ParkingPage API mode 不 crash。
+
 ## 9. 結論
 
 ```text

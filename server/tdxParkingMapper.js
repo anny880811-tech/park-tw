@@ -16,17 +16,39 @@ const getLocalizedText = (value) => {
   return value.Zh_tw || value.ZhTw || value.En || ''
 }
 
+const getFirstValue = (...values) => {
+  return values.find((value) => value !== undefined && value !== null && value !== '')
+}
+
 const toNumberOrNull = (value) => {
   const numberValue = Number(value)
 
   return Number.isFinite(numberValue) ? numberValue : null
 }
 
+const getParkingSpacesTotal = (spaces = []) => {
+  if (!Array.isArray(spaces)) {
+    return null
+  }
+
+  const totalSpaces = spaces.reduce((total, item) => {
+    const spacesCount = toNumberOrNull(item?.Spaces)
+      ?? toNumberOrNull(item?.NumberOfSpaces)
+      ?? toNumberOrNull(item?.TotalSpaces)
+      ?? 0
+
+    return total + spacesCount
+  }, 0)
+
+  return totalSpaces > 0 ? totalSpaces : null
+}
+
 export const normalizeTdxParkingLot = (rawItem = {}) => {
-  const position = rawItem.CarParkPosition || {}
+  const position = rawItem.CarParkPosition || rawItem.Position || {}
+  const totalSpaces = toNumberOrNull(rawItem.TotalSpaces)
+    ?? getParkingSpacesTotal(rawItem.ParkingSpaces)
 
   return {
-    // TODO: Map totalSpaces, carSpaces, motorSpaces, district and open status after confirming TDX schema.
     id: rawItem.CarParkID || '',
     name: getLocalizedText(rawItem.CarParkName),
     type: PARKING_TYPES.OFF_STREET,
@@ -37,7 +59,7 @@ export const normalizeTdxParkingLot = (rawItem = {}) => {
     address: rawItem.Address || '',
     latitude: toNumberOrNull(position.PositionLat),
     longitude: toNumberOrNull(position.PositionLon),
-    totalSpaces: null,
+    totalSpaces,
     availableSpaces: null,
     carSpaces: null,
     motorSpaces: null,
@@ -49,17 +71,39 @@ export const normalizeTdxParkingLot = (rawItem = {}) => {
 }
 
 export const normalizeTdxParkingAvailability = (rawItem = {}) => {
-  void rawItem
+  const serviceStatus = getFirstValue(rawItem.ServiceStatus, rawItem.ServiceStatusType)
+  const fullStatus = getFirstValue(rawItem.FullStatus, rawItem.FullStatusType)
+  const chargeStatus = getFirstValue(rawItem.ChargeStatus, rawItem.ChargeStatusType)
+  const availableSpaces = toNumberOrNull(
+    getFirstValue(rawItem.AvailableSpaces, rawItem.AvailableSpace),
+  )
+  const totalSpaces = toNumberOrNull(rawItem.TotalSpaces)
+  const isClosed = serviceStatus === 0 || serviceStatus === '0'
+  const isFull = fullStatus === 1 || fullStatus === '1' || availableSpaces === 0
+  const hasKnownStatus = (
+    serviceStatus !== undefined
+    || fullStatus !== undefined
+    || availableSpaces !== null
+  )
 
   return {
-    // TODO: map TDX real-time parking availability fields after confirming OpenAPI schema.
-    id: '',
+    id: rawItem.CarParkID || '',
+    name: getLocalizedText(rawItem.CarParkName),
     source: PARKING_SOURCES.TDX,
-    totalSpaces: null,
-    availableSpaces: null,
-    isOpen: null,
-    status: PARKING_STATUS.UNKNOWN,
-    updatedAt: '',
+    totalSpaces,
+    availableSpaces,
+    serviceStatus,
+    fullStatus,
+    chargeStatus,
+    isOpen: serviceStatus === undefined ? null : !isClosed,
+    status: hasKnownStatus
+      ? isClosed
+        ? PARKING_STATUS.CLOSED
+        : isFull
+          ? PARKING_STATUS.FULL
+          : PARKING_STATUS.AVAILABLE
+      : PARKING_STATUS.UNKNOWN,
+    updatedAt: rawItem.DataCollectTime || rawItem.UpdateTime || rawItem.SrcUpdateTime || '',
   }
 }
 
@@ -93,11 +137,14 @@ export const mergeTdxParkingLotWithAvailability = (
   availability = {},
 ) => {
   return {
-    // TODO: merge static TDX parking lot data with normalized real-time availability.
     ...parkingLot,
+    name: parkingLot.name || availability.name || '',
     totalSpaces: availability.totalSpaces ?? parkingLot.totalSpaces ?? null,
     availableSpaces:
       availability.availableSpaces ?? parkingLot.availableSpaces ?? null,
+    serviceStatus: availability.serviceStatus,
+    fullStatus: availability.fullStatus,
+    chargeStatus: availability.chargeStatus,
     isOpen: availability.isOpen ?? parkingLot.isOpen ?? null,
     status: availability.status ?? parkingLot.status ?? PARKING_STATUS.UNKNOWN,
     updatedAt: availability.updatedAt ?? parkingLot.updatedAt ?? '',
