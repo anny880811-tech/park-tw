@@ -215,6 +215,8 @@ VITE_TDX_CLIENT_SECRET
 
 第二十九階段讓 `/api/parking` 合併 TDX CarPark 基本資料與 ParkingAvailability 即時剩餘車位資料。API mode 若要支援 2 公里範圍篩選與距離排序，需要停車場經緯度，因此由 CarPark 提供位置與地址，再以 ParkingAvailability 補足剩餘車位、服務狀態與更新時間。
 
+第三十一階段開始嘗試整合路邊停車格 / 路邊停車路段資料。路邊停車資料在不同縣市的資料完整度可能不同；若資料沒有 `latitude` / `longitude`，前端無法判斷是否位於使用者 2 公里內，因此不會硬猜座標。
+
 未來正式串接 TDX 時，建議資料流為：
 
 ```text

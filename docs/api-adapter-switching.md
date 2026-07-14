@@ -113,6 +113,9 @@ fallback meta 範例：
 - 第二十八階段開始統一處理使用者座標距離排序。HomePage 與 ParkingPage 都會在取得使用者座標後，將資料依距離由近到遠排序；沒有座標的資料會保留顯示並排在後面。
 - 第二十九階段後，API adapter 接收 `/api/parking` 合併後資料；前端仍只透過 `parkingService` 與 `/api/parking`，不直接呼叫 TDX。
 - 第三十階段開始移除僅顯示 20 筆的限制。ParkingPage 會以使用者座標為中心，保留 2 公里內符合條件的資料，並在畫面層以每頁 12 張卡片分頁顯示；搜尋、定位或資料重新載入後會回到第 1 頁。
+- 第三十階段補充二讓 HomePage 停車場區塊也共用相同分頁規則：HomePage 與 ParkingPage 皆以使用者座標為中心，顯示 2 公里內符合條件的停車場資料，並以每頁 12 張卡片分頁顯示。
+- 第三十階段補充三確認 HomePage 會同時顯示停車場與路邊停車格區塊。停車場資料支援 2 公里內、距離排序與 12 張卡片分頁；路邊停車格若資料來源有回傳會正常顯示，若 API mode 尚未提供則顯示友善空狀態。
+- 第三十一階段開始讓 API adapter 保留 `/api/parking` 回傳的 `streetParkingSpaces`。HomePage 會依資料狀態顯示路邊停車格卡片或友善空狀態，React 前端仍不直接呼叫 TDX。
 - Production 若要啟用 API mode，需設定公開前端變數 `VITE_PARKING_DATA_SOURCE=api`；未設定時預設仍使用 mock adapter。
 - 在 Vercel Preview 驗證 `/api/parking?city=Taipei` 成功後，再測試 `VITE_PARKING_DATA_SOURCE=api`。
 - 補齊 `/api/parking` 對 keyword / city / district 的查詢策略。

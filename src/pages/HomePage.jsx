@@ -5,7 +5,9 @@ import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
 import DataStatusNotice from '../components/ui/DataStatusNotice.jsx'
+import Pagination from '../components/ui/Pagination.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
+import { PARKING_PAGE_SIZE } from '../constants/pagination.js'
 import { getNearbyParking } from '../services/parkingService.js'
 
 const getLatestUpdatedAt = (items = []) => {
@@ -13,6 +15,7 @@ const getLatestUpdatedAt = (items = []) => {
 }
 
 const HomePage = () => {
+  const [currentParkingLotPage, setCurrentParkingLotPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
   const [dataError, setDataError] = useState('')
@@ -47,6 +50,7 @@ const HomePage = () => {
           setParkingLots(result.parkingLots)
           setStreetParkingSpaces(result.streetParkingSpaces)
           setParkingMeta(result.meta)
+          setCurrentParkingLotPage(1)
         }
       } catch {
         if (isActive) {
@@ -70,6 +74,16 @@ const HomePage = () => {
   }, [canSortByPosition, position])
   const updatedAt = getLatestUpdatedAt(parkingLots)
   const hasNearbyParkingData = parkingLots.length > 0 || streetParkingSpaces.length > 0
+  const isApiDataSource = parkingMeta?.dataSource === 'api'
+  const totalParkingLotPages = Math.ceil(parkingLots.length / PARKING_PAGE_SIZE)
+  const safeParkingLotPage = totalParkingLotPages > 0
+    ? Math.min(currentParkingLotPage, totalParkingLotPages)
+    : 1
+  const parkingLotStartIndex = (safeParkingLotPage - 1) * PARKING_PAGE_SIZE
+  const visibleParkingLots = parkingLots.slice(
+    parkingLotStartIndex,
+    parkingLotStartIndex + PARKING_PAGE_SIZE,
+  )
 
   return (
     <div className="home-page">
@@ -93,7 +107,7 @@ const HomePage = () => {
               >
                 {isLoading ? '定位中...' : '使用目前位置'}
               </Button>
-              <small>定位成功後仍使用 mock data 顯示附近停車資訊。</small>
+              <small>定位成功後會顯示 2 公里內停車資料。</small>
             </div>
           </div>
         </div>
@@ -111,9 +125,13 @@ const HomePage = () => {
         />
 
         <div className="mock-data-notice">
-          <Badge variant="secondary">Mock Data</Badge>
+          <Badge variant={canSortByPosition ? 'success' : 'secondary'}>
+            {canSortByPosition ? '2 公里內資料' : '預設資料'}
+          </Badge>
           <p className="mb-0">
-            以下資料為畫面展示用假資料，尚未串接即時停車資訊。
+            {canSortByPosition
+              ? '已依目前位置篩選 2 公里內停車場，並由近到遠排序。'
+              : '尚未取得位置，先顯示預設停車資料。'}
           </p>
         </div>
 
@@ -128,13 +146,29 @@ const HomePage = () => {
         ) : (
           <>
             <NearbyParkingSection
-              description="顯示目前位置附近的路外停車場、剩餘車位與收費資訊。"
-              items={parkingLots}
+              description={
+                canSortByPosition
+                  ? `共找到 ${parkingLots.length} 筆 2 公里內停車場，第 ${safeParkingLotPage} / ${totalParkingLotPages} 頁。`
+                  : '顯示目前位置附近的路外停車場、剩餘車位與收費資訊；定位後會顯示 2 公里內資料。'
+              }
+              items={visibleParkingLots}
               title="附近停車場"
-            />
+            >
+              <Pagination
+                className="mt-4"
+                currentPage={safeParkingLotPage}
+                onPageChange={setCurrentParkingLotPage}
+                totalPages={totalParkingLotPages}
+              />
+            </NearbyParkingSection>
 
             <NearbyParkingSection
               description="顯示目前位置附近的路邊停車格與可用格位。"
+              emptyText={
+                isApiDataSource
+                  ? '目前尚未取得路邊停車格即時資料。'
+                  : '目前 2 公里內沒有可顯示的路邊停車格。'
+              }
               items={streetParkingSpaces}
               title="附近路邊停車格"
             />

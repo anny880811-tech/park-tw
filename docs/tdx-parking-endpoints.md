@@ -96,25 +96,26 @@
 
 | 項目 | 目前結論 |
 | --- | --- |
-| endpoint 名稱 | 路邊停車資料，正式名稱待確認 |
-| endpoint path | 待確認：需要人工對照 TDX Swagger / OpenAPI schema |
-| 是否支援指定縣市 | 待確認 |
-| 是否支援路段資料 | 待確認 |
+| endpoint 名稱 | 路邊停車路段資料，正式名稱仍需對照官方 schema |
+| endpoint path | 第三十一階段先嘗試 `/api/basic/v1/Parking/OnStreet/ParkingSegment/City/{city}` |
+| 是否支援指定縣市 | 依 candidate endpoint 設計為支援 city path |
+| 是否支援路段資料 | 第三十一階段以路段資料作為最小整合方向 |
 | 是否支援單一車格資料 | 待確認 |
-| 是否包含路段 ID | 待確認 |
+| 是否包含路段 ID | mapper 支援 `ParkingSegmentID` / `SegmentID` / `RoadSectionID` |
 | 是否包含車格 ID | 待確認 |
-| 是否包含路段名稱 | 待確認 |
-| 是否包含經緯度 | 待確認 |
-| 是否包含剩餘格位 | 待確認 |
+| 是否包含路段名稱 | mapper 支援 `RoadName` / `Road` / `SectionName` / 多語系名稱 |
+| 是否包含經緯度 | mapper 支援 `ParkingSegmentPosition` / `ParkingSpacePosition` / `Position` / 起訖點中心座標 |
+| 是否包含剩餘格位 | mapper 支援 `AvailableSpaces` / `AvailableSpace` / `RemainingSpaces` / `SurplusSpaces` |
 | 是否包含占用狀態 | 待確認 |
-| 是否包含收費方式 | 待確認 |
-| 是否包含更新時間 | 待確認 |
+| 是否包含收費方式 | mapper 支援 `FareDescription` / `ChargeDescription` |
+| 是否包含更新時間 | mapper 支援 `DataCollectTime` / `UpdateTime` / `SrcUpdateTime` |
 
 設計假設：
 
 - 路邊停車可能以路段、區域或單一車格為資料粒度。
 - 若只提供路段剩餘數，`spaceId` 可為空字串，`availableSpaces` 代表路段可用格數。
 - 若只提供占用狀態，adapter 需轉換成 `PARKING_STATUS`。
+- 第三十一階段路邊資料取得失敗時，不應讓路外停車場資料一起失敗；`streetParkingSpaces` 會維持空陣列並在 `meta` 保留安全狀態欄位。
 
 ## 7. OData query 支援整理
 
@@ -199,6 +200,20 @@ TDX API 常見可能支援 OData query，但停車 API 實際支援範圍需以 
 | 待確認：收費方式 | `price` | 卡片顯示 | 選用 | 空字串 | 格式是否為純文字或結構化 |
 | 待確認：占用 / 可停狀態 | `status` | 狀態 badge | 建議 | `unknown` | 狀態 enum 對照 |
 | 待確認：更新時間 | `updatedAt` | 資料新鮮度 | 建議 | 空字串 | 時區與格式 |
+
+第三十一階段初步 mapper 支援下列 candidate 欄位：
+
+| candidate raw 欄位 | 內部 model 欄位 | 說明 |
+| --- | --- | --- |
+| `ParkingSegmentID` / `SegmentID` / `RoadSectionID` | `id` / `sectionId` | 路段識別 |
+| `ParkingSpaceID` / `SpaceID` | `spaceId` | 單格識別，若資料為路段可為空 |
+| `RoadName` / `Road` / `SectionName` | `road` / `roadName` | 路段顯示名稱 |
+| `ParkingSegmentPosition` / `ParkingSpacePosition` / `Position` | `latitude` / `longitude` | 距離計算座標 |
+| `StartPosition` + `EndPosition` | `latitude` / `longitude` | 若只有路段起訖點，取中心點 |
+| `TotalSpaces` / `Spaces` / `NumberOfSpaces` | `totalSpaces` | 路段或格位總數 |
+| `AvailableSpaces` / `AvailableSpace` / `RemainingSpaces` / `SurplusSpaces` | `availableSpaces` | 路段剩餘格位 |
+| `FareDescription` / `ChargeDescription` | `price` | 收費文字 |
+| `DataCollectTime` / `UpdateTime` / `SrcUpdateTime` | `updatedAt` | 更新時間 |
 
 ## 9. endpoint 使用策略
 

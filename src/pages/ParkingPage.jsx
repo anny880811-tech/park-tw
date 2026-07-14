@@ -9,8 +9,7 @@ import SearchBar from '../components/ui/SearchBar.jsx'
 import LocationStatus from '../components/location/LocationStatus.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
 import { searchParkingLots } from '../services/parkingService.js'
-
-const PARKING_PAGE_SIZE = 12
+import { PARKING_PAGE_SIZE } from '../constants/pagination.js'
 
 const getLatestUpdatedAt = (items = []) => {
   return items.find((item) => item.updatedAt)?.updatedAt || ''

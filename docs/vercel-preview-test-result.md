@@ -175,6 +175,24 @@ https://<your-preview-url>/api/parking?city=Taipei
 - 搜尋、定位或資料重新載入後，分頁會回到第 1 頁。
 - 分頁只在畫面層處理，不會因切換頁碼重新呼叫 TDX API。
 
+第三十階段補充二：首頁停車場分頁。
+
+- HomePage 停車場區塊同樣使用 2 公里內資料。
+- HomePage 停車場區塊每頁顯示 12 張卡片。
+- HomePage 定位或資料重新載入後，分頁會回到第 1 頁。
+
+第三十階段補充三：首頁路邊停車格區塊。
+
+- HomePage 會顯示停車場與路邊停車格區塊。
+- 路邊停車格若資料來源有回傳，會正常顯示卡片。
+- API mode 目前尚未整合真實路邊停車格資料；若 `streetParkingSpaces` 為空陣列，首頁會顯示友善空狀態。
+
+第三十一階段：路邊停車格 / 路邊停車路段資料整合。
+
+- `/api/parking` 會嘗試取得 TDX OnStreet `ParkingSegment` candidate endpoint。
+- 若路邊資料取得失敗，`streetParkingSpaces` 會維持空陣列，不影響 `parkingLots`。
+- API response 不應包含 token、secret 或 Authorization header。
+
 ## 9. 結論
 
 ```text

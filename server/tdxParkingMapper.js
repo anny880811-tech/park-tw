@@ -26,6 +26,45 @@ const toNumberOrNull = (value) => {
   return Number.isFinite(numberValue) ? numberValue : null
 }
 
+const getPosition = (...positions) => {
+  return positions.find((position) => position && typeof position === 'object') || {}
+}
+
+const getPositionLatitude = (position = {}) => {
+  return toNumberOrNull(
+    getFirstValue(
+      position.PositionLat,
+      position.Latitude,
+      position.Lat,
+      position.lat,
+    ),
+  )
+}
+
+const getPositionLongitude = (position = {}) => {
+  return toNumberOrNull(
+    getFirstValue(
+      position.PositionLon,
+      position.PositionLng,
+      position.Longitude,
+      position.Lon,
+      position.Lng,
+      position.lng,
+    ),
+  )
+}
+
+const getCenterCoordinate = (startValue, endValue) => {
+  const startNumber = toNumberOrNull(startValue)
+  const endNumber = toNumberOrNull(endValue)
+
+  if (startNumber === null || endNumber === null) {
+    return null
+  }
+
+  return (startNumber + endNumber) / 2
+}
+
 const getParkingSpacesTotal = (spaces = []) => {
   if (!Array.isArray(spaces)) {
     return null
@@ -107,28 +146,79 @@ export const normalizeTdxParkingAvailability = (rawItem = {}) => {
   }
 }
 
-export const normalizeTdxStreetParking = (rawItem = {}) => {
-  void rawItem
+export const normalizeTdxStreetParking = (rawItem = {}, fallback = {}) => {
+  const position = getPosition(
+    rawItem.ParkingSegmentPosition,
+    rawItem.ParkingSpacePosition,
+    rawItem.Position,
+    rawItem.CenterPosition,
+  )
+  const startPosition = getPosition(rawItem.StartPosition)
+  const endPosition = getPosition(rawItem.EndPosition)
+  const latitude = getPositionLatitude(position)
+    ?? getCenterCoordinate(
+      getPositionLatitude(startPosition),
+      getPositionLatitude(endPosition),
+    )
+  const longitude = getPositionLongitude(position)
+    ?? getCenterCoordinate(
+      getPositionLongitude(startPosition),
+      getPositionLongitude(endPosition),
+    )
+  const id = getFirstValue(
+    rawItem.ParkingSegmentID,
+    rawItem.SegmentID,
+    rawItem.RoadSectionID,
+    rawItem.ParkingSpaceID,
+    rawItem.SpaceID,
+    rawItem.ID,
+  ) || ''
+  const road = getFirstValue(
+    rawItem.RoadName,
+    rawItem.Road,
+    rawItem.SectionName,
+    getLocalizedText(rawItem.ParkingSegmentName),
+    getLocalizedText(rawItem.ParkingSpaceName),
+  ) || ''
+  const name = getFirstValue(
+    getLocalizedText(rawItem.ParkingSegmentName),
+    getLocalizedText(rawItem.ParkingSpaceName),
+    rawItem.Name,
+    road,
+  ) || ''
 
   return {
-    // TODO: map TDX on-street parking fields after confirming OpenAPI schema.
-    id: '',
-    name: '',
+    id,
+    name,
     type: PARKING_TYPES.STREET,
     source: PARKING_SOURCES.TDX,
-    city: '',
-    cityCode: '',
-    district: '',
-    road: '',
-    sectionId: '',
-    spaceId: '',
-    spaceType: '',
-    latitude: null,
-    longitude: null,
-    availableSpaces: null,
-    price: '',
+    city: rawItem.City || fallback.city || '',
+    cityCode: rawItem.CityCode || rawItem.AuthorityCode || fallback.cityCode || '',
+    district: rawItem.TownName || rawItem.District || '',
+    road,
+    roadName: road,
+    address: rawItem.Address || road,
+    sectionId: getFirstValue(rawItem.ParkingSegmentID, rawItem.SegmentID, rawItem.RoadSectionID) || '',
+    spaceId: getFirstValue(rawItem.ParkingSpaceID, rawItem.SpaceID) || '',
+    spaceType: getFirstValue(rawItem.SpaceType, rawItem.VehicleType) || '',
+    latitude,
+    longitude,
+    totalSpaces: toNumberOrNull(
+      getFirstValue(rawItem.TotalSpaces, rawItem.Spaces, rawItem.NumberOfSpaces),
+    ),
+    availableSpaces: toNumberOrNull(
+      getFirstValue(
+        rawItem.AvailableSpaces,
+        rawItem.AvailableSpace,
+        rawItem.RemainingSpaces,
+        rawItem.SurplusSpaces,
+      ),
+    ),
+    price: getFirstValue(rawItem.FareDescription, rawItem.ChargeDescription) || '',
+    chargeStatus: getFirstValue(rawItem.ChargeStatus, rawItem.ChargeStatusType),
+    serviceStatus: getFirstValue(rawItem.ServiceStatus, rawItem.ServiceStatusType),
     status: PARKING_STATUS.UNKNOWN,
-    updatedAt: '',
+    updatedAt: rawItem.DataCollectTime || rawItem.UpdateTime || rawItem.SrcUpdateTime || '',
   }
 }
 

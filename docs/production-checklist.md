@@ -50,6 +50,11 @@ VITE_PARKING_DATA_SOURCE=api
 - `parkingLots` 不包含 token、secret 或 Authorization header。
 - HomePage API mode 可用合併後座標進行 2 公里範圍篩選。
 - ParkingPage API mode 可用合併後座標進行 2 公里範圍篩選。
+- 首頁停車場區塊以每頁 12 張卡片分頁。
+- 首頁定位或資料重新載入後，停車場分頁回到第 1 頁。
+- 首頁會顯示路邊停車格區塊；mock mode 有資料時顯示卡片，API mode 尚未提供路邊停車格時顯示友善空狀態。
+- `/api/parking?city=Taichung` 回傳 `streetParkingSpaces` 欄位。
+- `streetParkingSpaces` 不包含 token、secret 或 Authorization header。
 - `/parking` 不只顯示前 20 筆。
 - `/parking` 以使用者座標為中心，顯示 2 公里內符合條件的停車場，並以每頁 12 張卡片分頁。
 - 搜尋後分頁會回到第 1 頁。
