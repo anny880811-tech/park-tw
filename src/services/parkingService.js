@@ -44,7 +44,12 @@ const filterParkingByVehicleType = (
   items = [],
   vehicleType = VEHICLE_FILTERS.ALL,
 ) => {
-  if (!vehicleType || vehicleType === VEHICLE_FILTERS.ALL) {
+  const shouldFilterByVehicleType = (
+    vehicleType === VEHICLE_FILTERS.CAR
+    || vehicleType === VEHICLE_FILTERS.MOTORCYCLE
+  )
+
+  if (!shouldFilterByVehicleType) {
     return items
   }
 

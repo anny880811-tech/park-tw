@@ -123,6 +123,11 @@ const HomePage = () => {
     setCurrentParkingLotPage(1)
     setCurrentStreetParkingPage(1)
   }
+  const streetParkingEmptyText = selectedVehicleType === VEHICLE_FILTERS.ALL
+    ? isApiDataSource
+      ? '目前尚未取得路邊停車格即時資料。'
+      : '目前 2 公里內沒有可顯示的路邊停車格。'
+    : '目前 2 公里內沒有符合所選車種的路邊停車格。'
 
   return (
     <div className="home-page">
@@ -226,11 +231,7 @@ const HomePage = () => {
                   ? `共顯示 ${pagedStreetParkingSpaces.length} 筆以內的 2 公里內路邊停車格，第 ${safeStreetParkingPage} / ${totalStreetParkingPages} 頁。`
                   : '顯示目前位置附近的路邊停車格與可用格位。'
               }
-              emptyText={
-                isApiDataSource
-                  ? '目前尚未取得路邊停車格即時資料。'
-                  : '目前 2 公里內沒有可顯示的路邊停車格。'
-              }
+              emptyText={streetParkingEmptyText}
               items={visibleStreetParkingSpaces}
               title="附近路邊停車格"
             >
