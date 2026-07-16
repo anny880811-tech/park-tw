@@ -22,6 +22,10 @@ const getFirstValue = (...values) => {
 }
 
 const toNumberOrNull = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return null
+  }
+
   const numberValue = Number(value)
 
   return Number.isFinite(numberValue) ? numberValue : null
@@ -85,16 +89,30 @@ const getParkingSpacesTotal = (spaces = []) => {
 
 const getVehicleTypesFromText = (...values) => {
   const text = values
-    .filter((value) => value !== undefined && value !== null)
+    .filter((value) => typeof value === 'string')
     .join(' ')
     .toLowerCase()
   const vehicleTypes = new Set()
 
-  if (text.includes('car') || text.includes('汽車') || text.includes('小客車') || text.includes('小型車')) {
+  if (
+    text.includes('car')
+    || text.includes('汽車')
+    || text.includes('汽機車')
+    || text.includes('小客車')
+    || text.includes('自小客車')
+    || text.includes('小型車')
+    || text.includes('轎車')
+  ) {
     vehicleTypes.add(VEHICLE_FILTERS.CAR)
   }
 
-  if (text.includes('motor') || text.includes('scooter') || text.includes('機車')) {
+  if (
+    text.includes('motor')
+    || text.includes('scooter')
+    || text.includes('機車')
+    || text.includes('汽機車')
+    || text.includes('摩托車')
+  ) {
     vehicleTypes.add(VEHICLE_FILTERS.MOTORCYCLE)
   }
 
@@ -114,6 +132,11 @@ const getVehicleTypesFromParkingSpaces = (spaces = []) => {
       space?.VehicleType,
       space?.Type,
       space?.Description,
+      space?.FareDescription,
+      space?.ChargeDescription,
+      space?.Remark,
+      space?.Notes,
+      space?.ParkingInfo,
     ).forEach((vehicleType) => vehicleTypes.add(vehicleType))
   })
 
@@ -133,6 +156,11 @@ const getVehicleTypesFromAvailabilities = (availabilities = []) => {
       availability?.VehicleType,
       availability?.Type,
       availability?.Description,
+      availability?.FareDescription,
+      availability?.ChargeDescription,
+      availability?.Remark,
+      availability?.Notes,
+      availability?.ParkingInfo,
     ).forEach((vehicleType) => vehicleTypes.add(vehicleType))
   })
 
@@ -146,6 +174,11 @@ const getOffStreetVehicleTypes = (rawItem = {}) => {
       rawItem.CarParkID,
       getLocalizedText(rawItem.CarParkName),
       rawItem.Description,
+      rawItem.FareDescription,
+      rawItem.ChargeDescription,
+      rawItem.Remark,
+      rawItem.Notes,
+      rawItem.ParkingInfo,
     ),
   ])
 
@@ -162,6 +195,11 @@ const getStreetVehicleTypes = (rawItem = {}) => {
     rawItem.VehicleType,
     rawItem.Type,
     rawItem.Description,
+    rawItem.FareDescription,
+    rawItem.ChargeDescription,
+    rawItem.Remark,
+    rawItem.Notes,
+    rawItem.ParkingInfo,
     getLocalizedText(rawItem.ParkingSegmentName),
     getLocalizedText(rawItem.ParkingSpaceName),
   )
@@ -178,6 +216,11 @@ const getAvailabilitySpacesByVehicleType = (availabilities = []) => {
       availability?.VehicleType,
       availability?.Type,
       availability?.Description,
+      availability?.FareDescription,
+      availability?.ChargeDescription,
+      availability?.Remark,
+      availability?.Notes,
+      availability?.ParkingInfo,
     )
     const availableSpaces = toNumberOrNull(
       getFirstValue(availability?.AvailableSpaces, availability?.AvailableSpace),
