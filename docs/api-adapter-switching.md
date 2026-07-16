@@ -123,3 +123,10 @@ fallback meta 範例：
 - 補齊 `/api/parking` 對 keyword / city / district 的查詢策略。
 - 加入路外停車場即時剩餘車位 endpoint，並與基本資料 merge。
 - 規劃 UI 顯示目前資料來源與 fallback 狀態，但不要暴露任何 token 或 secret。
+# 第三十四階段：車種篩選補充
+
+HomePage 與 ParkingPage 支援車種篩選：全部、汽車、機車。
+
+未選擇或選擇全部時，顯示所有車種資料。選擇汽車或機車時，只顯示 `vehicleTypes` 包含對應車種的停車場或路邊停車格。
+
+車種篩選會在 2 公里範圍篩選後、keyword 搜尋與分頁前套用。部分資料來源可能未提供明確車種資訊，因此在汽車 / 機車篩選時可能不會被納入。

@@ -1,6 +1,7 @@
 import Badge from '../ui/Badge.jsx'
 import Card from '../ui/Card.jsx'
 import { formatDistance } from '../../utils/distance.js'
+import { VEHICLE_TYPE_LABELS } from '../../constants/vehicleTypes.js'
 
 const ParkingInfoCard = ({ item }) => {
   const {
@@ -15,6 +16,8 @@ const ParkingInfoCard = ({ item }) => {
     availableSpaces,
     price,
     isOpen,
+    vehicleTypes = [],
+    availableSpacesByVehicleType = {},
     features = [],
   } = item
   const hasAvailableSpaces = Number.isFinite(availableSpaces)
@@ -25,6 +28,17 @@ const ParkingInfoCard = ({ item }) => {
   const distanceText = displayDistance || (
     Number.isFinite(distance) ? formatDistance(distance) : ''
   )
+  const vehicleTypeLabels = vehicleTypes
+    .map((vehicleType) => VEHICLE_TYPE_LABELS[vehicleType])
+    .filter(Boolean)
+  const vehicleSpacesText = Object.entries(availableSpacesByVehicleType)
+    .map(([vehicleType, spaces]) => {
+      const label = VEHICLE_TYPE_LABELS[vehicleType]
+
+      return label && Number.isFinite(spaces) ? `${label} ${spaces}` : ''
+    })
+    .filter(Boolean)
+    .join('、')
 
   return (
     <Card className="parking-card" subtitle={locationText} title={name}>
@@ -55,6 +69,12 @@ const ParkingInfoCard = ({ item }) => {
           <dt>類型</dt>
           <dd>{type}</dd>
         </div>
+        {vehicleTypeLabels.length > 0 && (
+          <div>
+            <dt>支援車種</dt>
+            <dd>{vehicleTypeLabels.join('、')}</dd>
+          </div>
+        )}
         {distanceText && (
           <div>
             <dt>距離</dt>
@@ -68,6 +88,12 @@ const ParkingInfoCard = ({ item }) => {
             {hasAvailableSpaces && typeof totalSpaces === 'number' && ` / ${totalSpaces}`}
           </dd>
         </div>
+        {vehicleSpacesText && (
+          <div>
+            <dt>分車種剩餘</dt>
+            <dd>{vehicleSpacesText}</dd>
+          </div>
+        )}
         <div>
           <dt>收費</dt>
           <dd>{price}</dd>

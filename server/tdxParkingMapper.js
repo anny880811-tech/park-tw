@@ -3,6 +3,7 @@ import {
   PARKING_STATUS,
   PARKING_TYPES,
 } from '../src/models/parkingModel.js'
+import { VEHICLE_FILTERS } from '../src/constants/vehicleTypes.js'
 
 const getLocalizedText = (value) => {
   if (typeof value === 'string') {
@@ -82,6 +83,114 @@ const getParkingSpacesTotal = (spaces = []) => {
   return totalSpaces > 0 ? totalSpaces : null
 }
 
+const getVehicleTypesFromText = (...values) => {
+  const text = values
+    .filter((value) => value !== undefined && value !== null)
+    .join(' ')
+    .toLowerCase()
+  const vehicleTypes = new Set()
+
+  if (text.includes('car') || text.includes('汽車') || text.includes('小客車') || text.includes('小型車')) {
+    vehicleTypes.add(VEHICLE_FILTERS.CAR)
+  }
+
+  if (text.includes('motor') || text.includes('scooter') || text.includes('機車')) {
+    vehicleTypes.add(VEHICLE_FILTERS.MOTORCYCLE)
+  }
+
+  return Array.from(vehicleTypes)
+}
+
+const getVehicleTypesFromParkingSpaces = (spaces = []) => {
+  if (!Array.isArray(spaces)) {
+    return []
+  }
+
+  const vehicleTypes = new Set()
+
+  spaces.forEach((space) => {
+    getVehicleTypesFromText(
+      space?.SpaceType,
+      space?.VehicleType,
+      space?.Type,
+      space?.Description,
+    ).forEach((vehicleType) => vehicleTypes.add(vehicleType))
+  })
+
+  return Array.from(vehicleTypes)
+}
+
+const getVehicleTypesFromAvailabilities = (availabilities = []) => {
+  if (!Array.isArray(availabilities)) {
+    return []
+  }
+
+  const vehicleTypes = new Set()
+
+  availabilities.forEach((availability) => {
+    getVehicleTypesFromText(
+      availability?.SpaceType,
+      availability?.VehicleType,
+      availability?.Type,
+      availability?.Description,
+    ).forEach((vehicleType) => vehicleTypes.add(vehicleType))
+  })
+
+  return Array.from(vehicleTypes)
+}
+
+const getOffStreetVehicleTypes = (rawItem = {}) => {
+  const vehicleTypes = new Set([
+    ...getVehicleTypesFromParkingSpaces(rawItem.ParkingSpaces),
+    ...getVehicleTypesFromText(
+      rawItem.CarParkID,
+      getLocalizedText(rawItem.CarParkName),
+      rawItem.Description,
+    ),
+  ])
+
+  if (vehicleTypes.size === 0) {
+    vehicleTypes.add(VEHICLE_FILTERS.CAR)
+  }
+
+  return Array.from(vehicleTypes)
+}
+
+const getStreetVehicleTypes = (rawItem = {}) => {
+  return getVehicleTypesFromText(
+    rawItem.SpaceType,
+    rawItem.VehicleType,
+    rawItem.Type,
+    rawItem.Description,
+    getLocalizedText(rawItem.ParkingSegmentName),
+    getLocalizedText(rawItem.ParkingSpaceName),
+  )
+}
+
+const getAvailabilitySpacesByVehicleType = (availabilities = []) => {
+  if (!Array.isArray(availabilities)) {
+    return {}
+  }
+
+  return availabilities.reduce((spacesByVehicleType, availability) => {
+    const vehicleTypes = getVehicleTypesFromText(
+      availability?.SpaceType,
+      availability?.VehicleType,
+      availability?.Type,
+      availability?.Description,
+    )
+    const availableSpaces = toNumberOrNull(
+      getFirstValue(availability?.AvailableSpaces, availability?.AvailableSpace),
+    )
+
+    vehicleTypes.forEach((vehicleType) => {
+      spacesByVehicleType[vehicleType] = availableSpaces
+    })
+
+    return spacesByVehicleType
+  }, {})
+}
+
 export const normalizeTdxParkingLot = (rawItem = {}) => {
   const position = rawItem.CarParkPosition || rawItem.Position || {}
   const totalSpaces = toNumberOrNull(rawItem.TotalSpaces)
@@ -92,6 +201,9 @@ export const normalizeTdxParkingLot = (rawItem = {}) => {
     name: getLocalizedText(rawItem.CarParkName),
     type: PARKING_TYPES.OFF_STREET,
     source: PARKING_SOURCES.TDX,
+    vehicleTypes: getOffStreetVehicleTypes(rawItem),
+    availableSpacesByVehicleType: {},
+    totalSpacesByVehicleType: {},
     city: rawItem.City || '',
     cityCode: rawItem.CityCode || rawItem.AuthorityCode || '',
     district: '',
@@ -129,6 +241,8 @@ export const normalizeTdxParkingAvailability = (rawItem = {}) => {
     id: rawItem.CarParkID || '',
     name: getLocalizedText(rawItem.CarParkName),
     source: PARKING_SOURCES.TDX,
+    vehicleTypes: getVehicleTypesFromAvailabilities(rawItem.Availabilities),
+    availableSpacesByVehicleType: getAvailabilitySpacesByVehicleType(rawItem.Availabilities),
     totalSpaces,
     availableSpaces,
     serviceStatus,
@@ -192,6 +306,9 @@ export const normalizeTdxStreetParking = (rawItem = {}, fallback = {}) => {
     name,
     type: PARKING_TYPES.STREET,
     source: PARKING_SOURCES.TDX,
+    vehicleTypes: getStreetVehicleTypes(rawItem),
+    availableSpacesByVehicleType: {},
+    totalSpacesByVehicleType: {},
     city: rawItem.City || fallback.city || '',
     cityCode: rawItem.CityCode || rawItem.AuthorityCode || fallback.cityCode || '',
     district: rawItem.TownName || rawItem.District || '',
@@ -228,6 +345,13 @@ export const mergeTdxParkingLotWithAvailability = (
 ) => {
   return {
     ...parkingLot,
+    vehicleTypes: parkingLot.vehicleTypes?.length
+      ? parkingLot.vehicleTypes
+      : availability.vehicleTypes || [],
+    availableSpacesByVehicleType: {
+      ...(parkingLot.availableSpacesByVehicleType || {}),
+      ...(availability.availableSpacesByVehicleType || {}),
+    },
     name: parkingLot.name || availability.name || '',
     totalSpaces: availability.totalSpaces ?? parkingLot.totalSpaces ?? null,
     availableSpaces:

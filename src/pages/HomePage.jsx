@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import NearbyParkingSection from '../components/parking/NearbyParkingSection.jsx'
+import VehicleTypeFilter from '../components/parking/VehicleTypeFilter.jsx'
 import LocationStatus from '../components/location/LocationStatus.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -13,6 +14,7 @@ import {
   PARKING_PAGE_SIZE,
 } from '../constants/pagination.js'
 import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
+import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 import { getNearbyParking } from '../services/parkingService.js'
 
 const getLatestUpdatedAt = (items = []) => {
@@ -25,6 +27,7 @@ const HomePage = () => {
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
   const [selectedLandmark, setSelectedLandmark] = useState(null)
+  const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
   const [dataError, setDataError] = useState('')
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [parkingMeta, setParkingMeta] = useState(null)
@@ -52,8 +55,11 @@ const HomePage = () => {
               city: activeCity,
               latitude: activePosition.latitude,
               longitude: activePosition.longitude,
+              vehicleType: selectedVehicleType,
             }
-          : undefined
+          : {
+              vehicleType: selectedVehicleType,
+            }
         const result = await getNearbyParking(locationParams)
 
         if (isActive) {
@@ -82,7 +88,7 @@ const HomePage = () => {
     return () => {
       isActive = false
     }
-  }, [activeCity, activePosition])
+  }, [activeCity, activePosition, selectedVehicleType])
   const updatedAt = getLatestUpdatedAt(parkingLots)
   const hasNearbyParkingData = parkingLots.length > 0 || streetParkingSpaces.length > 0
   const isApiDataSource = parkingMeta?.dataSource === 'api'
@@ -112,6 +118,11 @@ const HomePage = () => {
     streetParkingStartIndex,
     streetParkingStartIndex + PARKING_PAGE_SIZE,
   )
+  const handleVehicleTypeChange = (vehicleType) => {
+    setSelectedVehicleType(vehicleType)
+    setCurrentParkingLotPage(1)
+    setCurrentStreetParkingPage(1)
+  }
 
   return (
     <div className="home-page">
@@ -176,6 +187,11 @@ const HomePage = () => {
               : '尚未取得位置，先顯示預設停車資料。'}
           </p>
         </div>
+
+        <VehicleTypeFilter
+          onChange={handleVehicleTypeChange}
+          value={selectedVehicleType}
+        />
 
         {!isDataLoading && !hasNearbyParkingData ? (
           <Card className="empty-state">

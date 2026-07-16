@@ -114,3 +114,12 @@ VITE_PARKING_DATA_SOURCE=api
 - 在 Vercel Production 設定 server-side env 與公開資料來源設定。
 - 先以 Preview 完成 API mode 驗證，再執行 Production 部署。
 - 下一階段可補齊縣市選擇器、經緯度轉縣市、即時剩餘車位 merge 與地圖功能規劃。
+# 第三十四階段：車種篩選人工測試
+
+- HomePage 顯示全部 / 汽車 / 機車篩選按鈕。
+- ParkingPage 顯示全部 / 汽車 / 機車篩選按鈕。
+- 未選擇或選擇全部時顯示所有車種資料。
+- 選擇汽車或機車時，只顯示 `vehicleTypes` 包含對應車種的資料。
+- 車種篩選會在 2 公里範圍篩選後、分頁前套用。
+- 切換車種後分頁回到第 1 頁。
+- 部分 API 資料若缺少明確車種資訊，不會被納入汽車 / 機車篩選。

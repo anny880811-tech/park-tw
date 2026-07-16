@@ -14,6 +14,7 @@ import {
   calculateDistanceInMeters,
   formatDistance,
 } from '../utils/distance.js'
+import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 
 const DEFAULT_PARKING_SEARCH_RADIUS_IN_METERS = 2000
 
@@ -36,6 +37,20 @@ const filterParkingLotsByKeyword = (parkingLots = [], keyword = '') => {
     ].filter(Boolean).join(' ').toLowerCase()
 
     return searchableText.includes(normalizedKeyword)
+  })
+}
+
+const filterParkingByVehicleType = (
+  items = [],
+  vehicleType = VEHICLE_FILTERS.ALL,
+) => {
+  if (!vehicleType || vehicleType === VEHICLE_FILTERS.ALL) {
+    return items
+  }
+
+  return items.filter((item) => {
+    return Array.isArray(item.vehicleTypes)
+      && item.vehicleTypes.includes(vehicleType)
   })
 }
 
@@ -72,16 +87,28 @@ const withDistance = (items = [], position) => {
     })
 }
 
-const withSortedParkingData = (result, position, { keyword = '' } = {}) => {
+const withSortedParkingData = (
+  result,
+  position,
+  {
+    keyword = '',
+    vehicleType = VEHICLE_FILTERS.ALL,
+  } = {},
+) => {
+  const parkingLotsByDistance = withDistance(result.parkingLots, position)
+  const streetParkingSpacesByDistance = result.streetParkingSpaces
+    ? withDistance(result.streetParkingSpaces, position)
+    : result.streetParkingSpaces
+
   return {
     ...result,
     parkingLots: filterParkingLotsByKeyword(
-      withDistance(result.parkingLots, position),
+      filterParkingByVehicleType(parkingLotsByDistance, vehicleType),
       keyword,
     ),
-    streetParkingSpaces: result.streetParkingSpaces
-      ? withDistance(result.streetParkingSpaces, position)
-      : result.streetParkingSpaces,
+    streetParkingSpaces: streetParkingSpacesByDistance
+      ? filterParkingByVehicleType(streetParkingSpacesByDistance, vehicleType)
+      : streetParkingSpacesByDistance,
   }
 }
 
@@ -98,14 +125,19 @@ const fallbackToMock = async (mockRequest, meta) => {
   return withMeta(result, meta)
 }
 
-export const getNearbyParking = async ({ city, latitude, longitude } = {}) => {
+export const getNearbyParking = async ({
+  city,
+  latitude,
+  longitude,
+  vehicleType = VEHICLE_FILTERS.ALL,
+} = {}) => {
   const params = { city, latitude, longitude }
   const position = params
 
   if (getParkingDataSource() !== PARKING_DATA_SOURCES.API) {
     const result = await getNearbyParkingFromMock(params)
 
-    return withMeta(withSortedParkingData(result, position), {
+    return withMeta(withSortedParkingData(result, position, { vehicleType }), {
       dataSource: PARKING_DATA_SOURCES.MOCK,
       fallback: false,
     })
@@ -114,7 +146,7 @@ export const getNearbyParking = async ({ city, latitude, longitude } = {}) => {
   try {
     const result = await getNearbyParkingFromApi(params)
 
-    return withMeta(withSortedParkingData(result, position), {
+    return withMeta(withSortedParkingData(result, position, { vehicleType }), {
       dataSource: PARKING_DATA_SOURCES.API,
       fallback: false,
       api: result.meta,
@@ -126,18 +158,24 @@ export const getNearbyParking = async ({ city, latitude, longitude } = {}) => {
       fallbackReason: 'API request failed.',
     })
 
-    return withSortedParkingData(fallbackResult, position)
+    return withSortedParkingData(fallbackResult, position, { vehicleType })
   }
 }
 
-export const searchParkingLots = async ({ city, keyword, latitude, longitude } = {}) => {
+export const searchParkingLots = async ({
+  city,
+  keyword,
+  latitude,
+  longitude,
+  vehicleType = VEHICLE_FILTERS.ALL,
+} = {}) => {
   const params = { city, latitude, longitude }
   const position = { latitude, longitude }
 
   if (getParkingDataSource() !== PARKING_DATA_SOURCES.API) {
     const result = await searchParkingLotsFromMock(params)
 
-    return withMeta(withSortedParkingData(result, position, { keyword }), {
+    return withMeta(withSortedParkingData(result, position, { keyword, vehicleType }), {
       dataSource: PARKING_DATA_SOURCES.MOCK,
       fallback: false,
     })
@@ -146,7 +184,7 @@ export const searchParkingLots = async ({ city, keyword, latitude, longitude } =
   try {
     const result = await searchParkingLotsFromApi(params)
 
-    return withMeta(withSortedParkingData(result, position, { keyword }), {
+    return withMeta(withSortedParkingData(result, position, { keyword, vehicleType }), {
       dataSource: PARKING_DATA_SOURCES.API,
       fallback: false,
       api: result.meta,
@@ -158,6 +196,6 @@ export const searchParkingLots = async ({ city, keyword, latitude, longitude } =
       fallbackReason: 'API request failed.',
     })
 
-    return withSortedParkingData(fallbackResult, position, { keyword })
+    return withSortedParkingData(fallbackResult, position, { keyword, vehicleType })
   }
 }

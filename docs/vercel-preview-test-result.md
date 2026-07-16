@@ -212,3 +212,8 @@ https://<your-preview-url>/api/parking?city=Taipei
 ```text
 本地檢查已通過；等待 Vercel Preview URL 與 server-side 環境變數完成設定後進行實測。
 ```
+# 第三十四階段：車種篩選測試項目
+
+HomePage 與 ParkingPage 已加入全部 / 汽車 / 機車篩選。測試時需確認車種篩選在 2 公里範圍篩選後、每頁 12 筆分頁前套用，且切換車種後頁碼會回到第 1 頁。
+
+若 API 資料沒有明確 `vehicleTypes`，在汽車 / 機車篩選時可能不會顯示該筆資料；選擇全部時仍可顯示。

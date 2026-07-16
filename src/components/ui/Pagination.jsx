@@ -39,12 +39,12 @@ const Pagination = ({
   return (
     <nav
       aria-label="停車場列表分頁"
-      className={className}
+      className={`parking-pagination ${className}`.trim()}
     >
-      <div className="d-flex d-md-none align-items-center justify-content-center gap-1 flex-nowrap">
+      <div className="parking-pagination__mobile d-flex d-md-none align-items-center justify-content-center gap-1 flex-nowrap px-2">
         <button
           aria-label="上一頁"
-          className="btn btn-outline-secondary btn-sm flex-shrink-0"
+          className="btn btn-outline-secondary btn-sm parking-pagination__button flex-shrink-0"
           disabled={effectiveCurrentPage === 1}
           onClick={() => handlePageChange(effectiveCurrentPage - 1)}
           type="button"
@@ -56,7 +56,7 @@ const Pagination = ({
           <button
             aria-current={page === currentPage ? 'page' : undefined}
             aria-label={`第 ${page} 頁`}
-            className={`btn btn-sm flex-shrink-0 ${
+            className={`btn btn-sm parking-pagination__button flex-shrink-0 ${
               page === effectiveCurrentPage ? 'btn-primary' : 'btn-outline-secondary'
             }`}
             key={page}
@@ -69,7 +69,7 @@ const Pagination = ({
 
         <select
           aria-label="選擇頁碼"
-          className="form-select form-select-sm w-auto flex-shrink-1"
+          className="form-select form-select-sm parking-pagination__select flex-shrink-1"
           onChange={(event) => handlePageChange(Number(event.target.value))}
           value={effectiveCurrentPage}
         >
@@ -82,7 +82,7 @@ const Pagination = ({
 
         <button
           aria-label="下一頁"
-          className="btn btn-outline-secondary btn-sm flex-shrink-0"
+          className="btn btn-outline-secondary btn-sm parking-pagination__button flex-shrink-0"
           disabled={effectiveCurrentPage === effectiveTotalPages}
           onClick={() => handlePageChange(effectiveCurrentPage + 1)}
           type="button"

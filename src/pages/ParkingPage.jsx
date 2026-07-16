@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ParkingInfoCard from '../components/parking/ParkingInfoCard.jsx'
+import VehicleTypeFilter from '../components/parking/VehicleTypeFilter.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
@@ -15,6 +16,7 @@ import {
   PARKING_PAGE_SIZE,
 } from '../constants/pagination.js'
 import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
+import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 
 const getLatestUpdatedAt = (items = []) => {
   return items.find((item) => item.updatedAt)?.updatedAt || ''
@@ -46,6 +48,7 @@ const ParkingPage = () => {
   const [parkingLots, setParkingLots] = useState([])
   const [parkingMeta, setParkingMeta] = useState(null)
   const [selectedLandmark, setSelectedLandmark] = useState(null)
+  const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
   const {
     status: locationStatus,
     position,
@@ -85,8 +88,11 @@ const ParkingPage = () => {
               city: activeCity,
               latitude: activePosition.latitude,
               longitude: activePosition.longitude,
+              vehicleType: selectedVehicleType,
             }
-          : undefined
+          : {
+              vehicleType: selectedVehicleType,
+            }
         const result = await searchParkingLots(locationParams)
 
         if (isActive) {
@@ -112,7 +118,7 @@ const ParkingPage = () => {
     return () => {
       isActive = false
     }
-  }, [activeCity, activePosition])
+  }, [activeCity, activePosition, selectedVehicleType])
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
@@ -126,6 +132,10 @@ const ParkingPage = () => {
 
   const handleClearKeyword = () => {
     setKeyword('')
+    setCurrentPage(1)
+  }
+  const handleVehicleTypeChange = (vehicleType) => {
+    setSelectedVehicleType(vehicleType)
     setCurrentPage(1)
   }
   const updatedAt = getLatestUpdatedAt(filteredParkingLots)
@@ -159,6 +169,10 @@ const ParkingPage = () => {
               onSubmit={handleSearchSubmit}
               placeholder="搜尋停車場名稱、地址或行政區"
               value={keyword}
+            />
+            <VehicleTypeFilter
+              onChange={handleVehicleTypeChange}
+              value={selectedVehicleType}
             />
             <div className="parking-search-panel__meta">
               <span>
