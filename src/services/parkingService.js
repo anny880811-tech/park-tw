@@ -54,7 +54,11 @@ const filterParkingByVehicleType = (
   })
 }
 
-const withDistance = (items = [], position) => {
+const withDistance = (
+  items = [],
+  position,
+  { keepItemsWithoutPosition = false } = {},
+) => {
   if (!hasPosition(position)) {
     return [...items]
   }
@@ -74,10 +78,11 @@ const withDistance = (items = [], position) => {
       }
     })
     .filter((item) => {
-      return (
-        Number.isFinite(item.distanceInMeters)
-        && item.distanceInMeters <= DEFAULT_PARKING_SEARCH_RADIUS_IN_METERS
-      )
+      if (!Number.isFinite(item.distanceInMeters)) {
+        return keepItemsWithoutPosition
+      }
+
+      return item.distanceInMeters <= DEFAULT_PARKING_SEARCH_RADIUS_IN_METERS
     })
     .sort((firstItem, secondItem) => {
       const firstDistance = firstItem.distanceInMeters ?? Number.POSITIVE_INFINITY
@@ -97,7 +102,9 @@ const withSortedParkingData = (
 ) => {
   const parkingLotsByDistance = withDistance(result.parkingLots, position)
   const streetParkingSpacesByDistance = result.streetParkingSpaces
-    ? withDistance(result.streetParkingSpaces, position)
+    ? withDistance(result.streetParkingSpaces, position, {
+        keepItemsWithoutPosition: true,
+      })
     : result.streetParkingSpaces
 
   return {
