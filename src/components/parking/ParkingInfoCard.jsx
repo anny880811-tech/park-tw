@@ -3,11 +3,20 @@ import Card from '../ui/Card.jsx'
 import { formatDistance } from '../../utils/distance.js'
 import { VEHICLE_TYPE_LABELS } from '../../constants/vehicleTypes.js'
 
+const getGoogleMapsDirectionsUrl = ({ latitude, longitude }) => {
+  const params = new URLSearchParams({
+    api: '1',
+    destination: `${latitude},${longitude}`,
+    travelmode: 'driving',
+  })
+
+  return `https://www.google.com/maps/dir/?${params.toString()}`
+}
+
 const ParkingInfoCard = ({ item }) => {
   const {
     name,
     type,
-    district,
     address,
     road,
     distance,
@@ -19,10 +28,13 @@ const ParkingInfoCard = ({ item }) => {
     vehicleTypes = [],
     availableSpacesByVehicleType = {},
     features = [],
+    latitude,
+    longitude,
   } = item
   const hasAvailableSpaces = Number.isFinite(availableSpaces)
   const hasSpaces = hasAvailableSpaces && availableSpaces > 0
   const hasOpenStatus = typeof isOpen === 'boolean'
+  const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude)
   const locationText = address || road
   const openStatus = isOpen === false ? '未營業' : '營業中'
   const distanceText = displayDistance || (
@@ -59,12 +71,6 @@ const ParkingInfoCard = ({ item }) => {
       </div>
 
       <dl className="parking-card__details">
-        {district && (
-          <div>
-            <dt>行政區</dt>
-            <dd>{district}</dd>
-          </div>
-        )}
         <div>
           <dt>類型</dt>
           <dd>{type}</dd>
@@ -99,6 +105,17 @@ const ParkingInfoCard = ({ item }) => {
           <dd>{price}</dd>
         </div>
       </dl>
+
+      {hasCoordinates && (
+        <a
+          className="btn btn-primary parking-card__directions"
+          href={getGoogleMapsDirectionsUrl({ latitude, longitude })}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          前往停車場
+        </a>
+      )}
     </Card>
   )
 }

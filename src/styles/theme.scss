@@ -410,6 +410,11 @@ small,
   text-align: right;
 }
 
+.parking-card__directions {
+  width: 100%;
+  margin-top: 1rem;
+}
+
 .parking-page {
   padding-bottom: 4rem;
 }
@@ -693,5 +698,63 @@ small,
 
   .parking-card__details dd {
     text-align: left;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .parking-card .card-body {
+    padding: 0.875rem;
+  }
+
+  .parking-card .ui-card__header {
+    margin-bottom: 0.6rem;
+  }
+
+  .parking-card .ui-card__title {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .parking-card .ui-card__subtitle {
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+
+  .parking-card__badges {
+    gap: 0.35rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .parking-card__badges .badge {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .parking-card__details {
+    gap: 0.4rem;
+    font-size: 0.875rem;
+  }
+
+  .parking-card__details div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .parking-card__details dt {
+    flex: 0 0 auto;
+  }
+
+  .parking-card__details dd {
+    text-align: right;
+  }
+
+  .parking-card__directions {
+    min-height: 2.25rem;
+    margin-top: 0.75rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.875rem;
   }
 }
