@@ -48,6 +48,13 @@ const streetParkingIcon = createMapIcon({
   iconSize: [28, 28],
   popupAnchor: [0, -14],
 })
+const parkingPopupProps = {
+  autoPan: true,
+  autoPanPadding: [16, 16],
+  keepInView: true,
+  maxWidth: 260,
+  minWidth: 144,
+}
 
 const MapCenterSync = ({ center, zoom }) => {
   const map = useMap()
@@ -142,14 +149,21 @@ const HomeParkingMap = ({
           key={key}
           position={[position.latitude, position.longitude]}
         >
-          <Popup>
+          <Popup {...parkingPopupProps}>
             <div className="parking-map__popup">
-              <strong>{item.name || '停車位置'}</strong>
-              <span>{getParkingTypeLabel(item)}</span>
-              {(item.address || item.road) && <span>{item.address || item.road}</span>}
-              {item.displayDistance && <span>距離：{item.displayDistance}</span>}
-              <span>剩餘車位：{getAvailableSpacesText(item)}</span>
+              <strong className="parking-map__popup-title">{item.name || '停車位置'}</strong>
+              <span className="parking-map__popup-type">{getParkingTypeLabel(item)}</span>
+              {(item.address || item.road) && (
+                <span className="parking-map__popup-address">{item.address || item.road}</span>
+              )}
+              {item.displayDistance && (
+                <span className="parking-map__popup-meta">距離：{item.displayDistance}</span>
+              )}
+              <span className="parking-map__popup-meta">
+                剩餘車位：{getAvailableSpacesText(item)}
+              </span>
               <a
+                className="parking-map__popup-directions"
                 href={getGoogleMapsDirectionsUrl(position)}
                 rel="noopener noreferrer"
                 target="_blank"
@@ -167,14 +181,21 @@ const HomeParkingMap = ({
           key={key}
           position={[position.latitude, position.longitude]}
         >
-          <Popup>
+          <Popup {...parkingPopupProps}>
             <div className="parking-map__popup">
-              <strong>{item.name || '停車位置'}</strong>
-              <span>{getParkingTypeLabel(item)}</span>
-              {(item.address || item.road) && <span>{item.address || item.road}</span>}
-              {item.displayDistance && <span>距離：{item.displayDistance}</span>}
-              <span>剩餘車位：{getAvailableSpacesText(item)}</span>
+              <strong className="parking-map__popup-title">{item.name || '停車位置'}</strong>
+              <span className="parking-map__popup-type">{getParkingTypeLabel(item)}</span>
+              {(item.address || item.road) && (
+                <span className="parking-map__popup-address">{item.address || item.road}</span>
+              )}
+              {item.displayDistance && (
+                <span className="parking-map__popup-meta">距離：{item.displayDistance}</span>
+              )}
+              <span className="parking-map__popup-meta">
+                剩餘車位：{getAvailableSpacesText(item)}
+              </span>
               <a
+                className="parking-map__popup-directions"
                 href={getGoogleMapsDirectionsUrl(position)}
                 rel="noopener noreferrer"
                 target="_blank"

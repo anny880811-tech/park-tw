@@ -19,6 +19,7 @@ const PARKING_DISPLAY_CATEGORIES = {
   PARKING_LOTS: 'parkingLots',
   STREET_PARKING: 'streetParking',
 }
+const HOME_MAP_CITY = 'Taichung'
 
 const HomePage = () => {
   const [currentParkingLotPage, setCurrentParkingLotPage] = useState(1)
@@ -28,6 +29,8 @@ const HomePage = () => {
   )
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
+  const [mapParkingLots, setMapParkingLots] = useState([])
+  const [mapStreetParkingSpaces, setMapStreetParkingSpaces] = useState([])
   const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [parkingMeta, setParkingMeta] = useState(null)
@@ -56,10 +59,18 @@ const HomePage = () => {
               vehicleType: selectedVehicleType,
             }
         const result = await getNearbyParking(locationParams)
+        const mapResult = activePosition
+          ? await getNearbyParking({
+              city: HOME_MAP_CITY,
+              vehicleType: selectedVehicleType,
+            })
+          : result
 
         if (isActive) {
           setParkingLots(result.parkingLots)
           setStreetParkingSpaces(result.streetParkingSpaces)
+          setMapParkingLots(mapResult.parkingLots)
+          setMapStreetParkingSpaces(mapResult.streetParkingSpaces)
           setParkingMeta(result.meta)
           setCurrentParkingLotPage(1)
           setCurrentStreetParkingPage(1)
@@ -68,6 +79,8 @@ const HomePage = () => {
         if (isActive) {
           setParkingLots([])
           setStreetParkingSpaces([])
+          setMapParkingLots([])
+          setMapStreetParkingSpaces([])
           setParkingMeta(null)
         }
       } finally {
@@ -130,30 +143,24 @@ const HomePage = () => {
       <section className="home-hero">
         <div className="container">
           <div className="home-hero__layout">
+            <p className="home-hero__lead">
+              快速找到附近可停車的位置
+            </p>
             <div className="home-hero__map">
               <HomeParkingMap
-                parkingLots={pagedParkingLots}
-                streetParkingSpaces={pagedStreetParkingSpaces}
+                parkingLots={mapParkingLots}
+                streetParkingSpaces={mapStreetParkingSpaces}
                 userPosition={activePosition}
               />
             </div>
-
-            <div className="home-hero__content">
-              <p className="home-hero__lead">
-                快速找到附近可停車的位置
-            </p>
-            <p className="home-hero__description">
-              使用目前位置查看附近停車場與路邊停車格。
-            </p>
             <Button
-                className="home-hero__button"
-                disabled={isLoading}
-                onClick={getCurrentLocation}
-                variant="primary"
-              >
-                {isLoading ? '定位中...' : '使用目前位置'}
-              </Button>
-            </div>
+              className="home-hero__button"
+              disabled={isLoading}
+              onClick={getCurrentLocation}
+              variant="primary"
+            >
+              {isLoading ? '定位中...' : '使用目前位置'}
+            </Button>
           </div>
         </div>
       </section>

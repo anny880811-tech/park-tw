@@ -54,7 +54,7 @@ const ParkingInfoCard = ({ item }) => {
     <Card className="parking-card" subtitle={locationText} title={name}>
       <div className="parking-card__badges">
         <Badge variant={hasAvailableSpaces ? (hasSpaces ? 'success' : 'danger') : 'secondary'}>
-          {hasAvailableSpaces ? (hasSpaces ? '尚有車位' : '已滿') : '車位未知'}
+          {hasAvailableSpaces ? (hasSpaces ? '尚有車位' : '已滿') : '未提供即時空位'}
         </Badge>
         {hasOpenStatus && (
           <Badge variant={isOpen === false ? 'secondary' : 'primary'}>
@@ -69,10 +69,6 @@ const ParkingInfoCard = ({ item }) => {
       </div>
 
       <dl className="parking-card__details">
-        <div>
-          <dt>類型</dt>
-          <dd>{type}</dd>
-        </div>
         {vehicleTypeLabels.length > 0 && (
           <div>
             <dt>支援車種</dt>

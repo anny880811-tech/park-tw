@@ -251,28 +251,26 @@ small,
 }
 
 .home-hero {
-  padding: 4rem 0 3rem;
+  padding: 2rem 0;
   background: var(--color-surface);
   border-bottom: 1px solid rgba(91, 124, 153, 0.1);
 }
 
 .home-hero__layout {
   display: grid;
-  gap: 1.75rem;
-}
-
-.home-hero__content {
-  display: grid;
-  max-width: 44rem;
+  grid-template-areas:
+    "lead"
+    "map"
+    "button";
   gap: 1rem;
 }
 
-.home-hero__content h1,
 .home-section__header h2 {
   margin-bottom: 0;
 }
 
 .home-hero__lead {
+  grid-area: lead;
   margin-bottom: 0;
   color: var(--color-text);
   font-size: 1.35rem;
@@ -294,7 +292,27 @@ small,
 }
 
 .home-hero__map {
+  grid-area: map;
   min-width: 0;
+}
+
+.home-hero__button {
+  grid-area: button;
+}
+
+@media (min-width: 768px) {
+  .home-hero__layout {
+    grid-template-areas:
+      "lead button ."
+      "map map map";
+    grid-template-columns: max-content max-content 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .home-hero__lead {
+    font-size: 2rem;
+  }
 }
 
 .parking-map {
@@ -370,21 +388,95 @@ small,
   box-shadow: 0 3px 10px rgba(47, 62, 70, 0.2);
 }
 
+.parking-map .leaflet-popup-content-wrapper {
+  max-width: calc(100vw - 2rem);
+  border-radius: var(--radius-md);
+}
+
+.parking-map .leaflet-popup-content {
+  max-width: min(16rem, calc(100vw - 4rem));
+  margin: 0.75rem;
+}
+
 .parking-map__popup {
   display: grid;
-  min-width: 11rem;
-  gap: 0.25rem;
+  width: min(14.5rem, calc(100vw - 5rem));
+  max-width: 100%;
+  max-height: min(15rem, calc(100vh - 10rem));
+  gap: 0.35rem;
   color: var(--color-text);
-  font-size: 0.875rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
-.parking-map__popup strong {
+.parking-map__popup-title {
   font-size: 0.95rem;
+  line-height: 1.3;
 }
 
-.parking-map__popup a {
+.parking-map__popup-type {
+  width: fit-content;
+  padding: 0.15rem 0.45rem;
+  background: rgba(91, 124, 153, 0.12);
+  border-radius: 999px;
   color: var(--color-secondary);
+  font-size: 0.75rem;
   font-weight: 700;
+  line-height: 1.35;
+}
+
+.parking-map__popup-address,
+.parking-map__popup-meta {
+  min-width: 0;
+}
+
+.parking-map__popup-directions {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.75rem;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+
+.parking-map__popup-directions:hover,
+.parking-map__popup-directions:focus {
+  background: var(--color-primary-hover);
+  color: var(--color-text);
+}
+
+@media (max-width: 767.98px) {
+  .parking-map .leaflet-popup-content {
+    max-width: min(13.5rem, calc(100vw - 4rem));
+    margin: 0.625rem;
+  }
+
+  .parking-map__popup {
+    width: min(12.5rem, calc(100vw - 5rem));
+    max-height: min(12rem, calc(76vw - 4rem));
+    gap: 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  .parking-map__popup-title {
+    font-size: 0.9rem;
+  }
+
+  .parking-map__popup-directions {
+    min-height: 2rem;
+    padding: 0.4rem 0.65rem;
+  }
 }
 
 .home-page__content {
@@ -817,14 +909,15 @@ small,
   }
 
   .home-hero {
-    padding: 3rem 0 2rem;
+    padding: 1.5rem 0;
   }
 
   .home-hero__layout {
-    gap: 1.5rem;
+    gap: 0.5rem;
   }
 
   .home-hero__button {
+    margin-top: 0.5rem;
     width: 100%;
   }
 
