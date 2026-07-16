@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import NearbyParkingSection from '../components/parking/NearbyParkingSection.jsx'
 import VehicleTypeFilter from '../components/parking/VehicleTypeFilter.jsx'
-import LocationStatus from '../components/location/LocationStatus.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
-import DataStatusNotice from '../components/ui/DataStatusNotice.jsx'
 import Pagination from '../components/ui/Pagination.jsx'
 import useGeolocation from '../hooks/useGeolocation.js'
 import {
@@ -13,33 +11,24 @@ import {
   MAX_PARKING_RESULTS,
   PARKING_PAGE_SIZE,
 } from '../constants/pagination.js'
-import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
 import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 import { getNearbyParking } from '../services/parkingService.js'
-
-const getLatestUpdatedAt = (items = []) => {
-  return items.find((item) => item.updatedAt)?.updatedAt || ''
-}
 
 const HomePage = () => {
   const [currentParkingLotPage, setCurrentParkingLotPage] = useState(1)
   const [currentStreetParkingPage, setCurrentStreetParkingPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
-  const [selectedLandmark, setSelectedLandmark] = useState(null)
   const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
-  const [dataError, setDataError] = useState('')
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [parkingMeta, setParkingMeta] = useState(null)
   const {
     status,
     position,
-    error,
     getCurrentLocation,
   } = useGeolocation()
   const isLoading = status === 'loading'
-  const activePosition = selectedLandmark || (status === 'success' ? position : null)
-  const activeCity = selectedLandmark?.city
+  const activePosition = status === 'success' ? position : null
   const canSortByPosition = Boolean(activePosition)
 
   useEffect(() => {
@@ -47,12 +36,10 @@ const HomePage = () => {
 
     const loadNearbyParking = async () => {
       setIsDataLoading(true)
-      setDataError('')
 
       try {
         const locationParams = activePosition
           ? {
-              city: activeCity,
               latitude: activePosition.latitude,
               longitude: activePosition.longitude,
               vehicleType: selectedVehicleType,
@@ -74,7 +61,6 @@ const HomePage = () => {
           setParkingLots([])
           setStreetParkingSpaces([])
           setParkingMeta(null)
-          setDataError('目前無法取得停車資料，請稍後再試。')
         }
       } finally {
         if (isActive) {
@@ -88,8 +74,7 @@ const HomePage = () => {
     return () => {
       isActive = false
     }
-  }, [activeCity, activePosition, selectedVehicleType])
-  const updatedAt = getLatestUpdatedAt(parkingLots)
+  }, [activePosition, selectedVehicleType])
   const hasNearbyParkingData = parkingLots.length > 0 || streetParkingSpaces.length > 0
   const isApiDataSource = parkingMeta?.dataSource === 'api'
   const pagedParkingLots = parkingLots.slice(0, MAX_PARKING_RESULTS)
@@ -134,65 +119,32 @@ const HomePage = () => {
       <section className="home-hero">
         <div className="container">
           <div className="home-hero__content">
-            <Badge variant="primary">附近停車資訊</Badge>
-            <h1>停哪裡</h1>
+            {/* <Badge variant="primary">附近停車資訊</Badge>
+            <div className="home-hero__title-row">
+              <h1>停哪裡</h1>
+              
+            </div> */}
             <p className="home-hero__lead">
               快速找到附近可停車的位置
             </p>
             <p className="home-hero__description">
               使用目前位置查看附近停車場與路邊停車格。
             </p>
-            <div className="home-hero__actions">
-              <Button
+            <Button
                 className="home-hero__button"
                 disabled={isLoading}
                 onClick={() => {
-                  setSelectedLandmark(null)
                   getCurrentLocation()
                 }}
                 variant="primary"
               >
                 {isLoading ? '定位中...' : '使用目前位置'}
               </Button>
-              <small>定位成功後會顯示 2 公里內停車資料。</small>
-            </div>
-            <div className="d-flex flex-wrap gap-2 mt-3">
-              {TEST_LANDMARKS.map((landmark) => (
-                <Button
-                  key={landmark.id}
-                  onClick={() => setSelectedLandmark(landmark)}
-                  variant={selectedLandmark?.id === landmark.id ? 'secondary' : 'outline'}
-                >
-                  {landmark.name}
-                </Button>
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
       <section className="container home-page__content">
-        <LocationStatus error={error} position={position} status={status} />
-
-        <DataStatusNotice
-          error={dataError}
-          isLoading={isDataLoading}
-          loadingText="正在載入停車資料..."
-          meta={parkingMeta}
-          updatedAt={updatedAt}
-        />
-
-        <div className="mock-data-notice">
-          <Badge variant={canSortByPosition ? 'success' : 'secondary'}>
-            {canSortByPosition ? '2 公里內資料' : '預設資料'}
-          </Badge>
-          <p className="mb-0">
-            {canSortByPosition
-              ? `已依${selectedLandmark ? selectedLandmark.name : '目前位置'}篩選 2 公里內停車場，並由近到遠排序。`
-              : '尚未取得位置，先顯示預設停車資料。'}
-          </p>
-        </div>
-
         <VehicleTypeFilter
           onChange={handleVehicleTypeChange}
           value={selectedVehicleType}
@@ -211,8 +163,8 @@ const HomePage = () => {
             <NearbyParkingSection
               description={
                 canSortByPosition
-                  ? `共顯示 ${pagedParkingLots.length} 筆以內的 2 公里內停車場，第 ${safeParkingLotPage} / ${totalParkingLotPages} 頁。`
-                  : '顯示目前位置附近的路外停車場、剩餘車位與收費資訊；定位後會顯示 2 公里內資料。'
+                  ? `共顯示 ${pagedParkingLots.length} 筆停車場，第 ${safeParkingLotPage} / ${totalParkingLotPages} 頁。`
+                  : '顯示目前可用的路外停車場、剩餘車位與收費資訊。'
               }
               items={visibleParkingLots}
               title="附近停車場"
@@ -228,8 +180,8 @@ const HomePage = () => {
             <NearbyParkingSection
               description={
                 canSortByPosition && pagedStreetParkingSpaces.length > 0
-                  ? `共顯示 ${pagedStreetParkingSpaces.length} 筆以內的 2 公里內路邊停車格，第 ${safeStreetParkingPage} / ${totalStreetParkingPages} 頁。`
-                  : '顯示目前位置附近的路邊停車格與可用格位。'
+                  ? `共顯示 ${pagedStreetParkingSpaces.length} 筆路邊停車格，第 ${safeStreetParkingPage} / ${totalStreetParkingPages} 頁。`
+                  : '顯示目前可用的路邊停車格與可用格位。'
               }
               emptyText={streetParkingEmptyText}
               items={visibleStreetParkingSpaces}

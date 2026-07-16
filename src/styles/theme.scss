@@ -267,6 +267,13 @@ small,
   margin-bottom: 0;
 }
 
+.home-hero__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
 .home-hero__lead {
   margin-bottom: 0;
   color: var(--color-text);
