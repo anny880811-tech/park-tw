@@ -1,17 +1,9 @@
 import Badge from '../ui/Badge.jsx'
 import Card from '../ui/Card.jsx'
 import { formatDistance } from '../../utils/distance.js'
+import { getGoogleMapsDirectionsUrl } from '../../utils/navigation.js'
 import { VEHICLE_TYPE_LABELS } from '../../constants/vehicleTypes.js'
-
-const getGoogleMapsDirectionsUrl = ({ latitude, longitude }) => {
-  const params = new URLSearchParams({
-    api: '1',
-    destination: `${latitude},${longitude}`,
-    travelmode: 'driving',
-  })
-
-  return `https://www.google.com/maps/dir/?${params.toString()}`
-}
+import { PARKING_TYPES } from '../../models/parkingModel.js'
 
 const ParkingInfoCard = ({ item }) => {
   const {
@@ -35,7 +27,13 @@ const ParkingInfoCard = ({ item }) => {
   const hasSpaces = hasAvailableSpaces && availableSpaces > 0
   const hasOpenStatus = typeof isOpen === 'boolean'
   const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude)
+  const isStreetParking = type === PARKING_TYPES.STREET || Boolean(road)
   const locationText = address || road
+  const availableSpacesText = hasAvailableSpaces
+    ? availableSpaces
+    : isStreetParking
+      ? '僅提供收費路段，無即時格位'
+      : '資料未提供'
   const openStatus = isOpen === false ? '未營業' : '營業中'
   const distanceText = displayDistance || (
     Number.isFinite(distance) ? formatDistance(distance) : ''
@@ -90,7 +88,7 @@ const ParkingInfoCard = ({ item }) => {
         <div>
           <dt>剩餘車位</dt>
           <dd>
-            {hasAvailableSpaces ? availableSpaces : '資料未提供'}
+            {availableSpacesText}
             {hasAvailableSpaces && typeof totalSpaces === 'number' && ` / ${totalSpaces}`}
           </dd>
         </div>

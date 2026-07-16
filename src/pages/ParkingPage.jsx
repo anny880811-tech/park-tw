@@ -134,7 +134,6 @@ const ParkingPage = () => {
       <section className="parking-page__header">
         <div className="container">
           <div className="parking-page__intro">
-            {/* <Badge variant="primary">Parking Search</Badge> */}
             <h1>停車場搜尋</h1>
             <p className="lead mb-0">
               輸入停車場名稱或地址，快速查看符合條件的停車場。

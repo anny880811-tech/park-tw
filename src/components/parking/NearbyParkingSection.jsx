@@ -10,13 +10,16 @@ const NearbyParkingSection = ({
   children,
 }) => {
   const hasItems = items.length > 0
+  const hasHeader = title || description
 
   return (
     <section className="home-section">
-      <div className="home-section__header">
-        <h2>{title}</h2>
-        {description && <p className="mb-0">{description}</p>}
-      </div>
+      {hasHeader && (
+        <div className="home-section__header">
+          {title && <h2>{title}</h2>}
+          {description && <p className="mb-0">{description}</p>}
+        </div>
+      )}
 
       {hasItems ? (
         <div className="row g-4">

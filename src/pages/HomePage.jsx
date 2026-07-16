@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import HomeParkingMap from '../components/map/HomeParkingMap.jsx'
 import NearbyParkingSection from '../components/parking/NearbyParkingSection.jsx'
 import VehicleTypeFilter from '../components/parking/VehicleTypeFilter.jsx'
 import Badge from '../components/ui/Badge.jsx'
@@ -14,9 +15,17 @@ import {
 import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 import { getNearbyParking } from '../services/parkingService.js'
 
+const PARKING_DISPLAY_CATEGORIES = {
+  PARKING_LOTS: 'parkingLots',
+  STREET_PARKING: 'streetParking',
+}
+
 const HomePage = () => {
   const [currentParkingLotPage, setCurrentParkingLotPage] = useState(1)
   const [currentStreetParkingPage, setCurrentStreetParkingPage] = useState(1)
+  const [activeParkingCategory, setActiveParkingCategory] = useState(
+    PARKING_DISPLAY_CATEGORIES.PARKING_LOTS,
+  )
   const [parkingLots, setParkingLots] = useState([])
   const [streetParkingSpaces, setStreetParkingSpaces] = useState([])
   const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
@@ -29,7 +38,6 @@ const HomePage = () => {
   } = useGeolocation()
   const isLoading = status === 'loading'
   const activePosition = status === 'success' ? position : null
-  const canSortByPosition = Boolean(activePosition)
 
   useEffect(() => {
     let isActive = true
@@ -108,6 +116,9 @@ const HomePage = () => {
     setCurrentParkingLotPage(1)
     setCurrentStreetParkingPage(1)
   }
+  const handleParkingCategoryChange = (category) => {
+    setActiveParkingCategory(category)
+  }
   const streetParkingEmptyText = selectedVehicleType === VEHICLE_FILTERS.ALL
     ? isApiDataSource
       ? '目前尚未取得路邊停車格即時資料。'
@@ -118,14 +129,18 @@ const HomePage = () => {
     <div className="home-page">
       <section className="home-hero">
         <div className="container">
-          <div className="home-hero__content">
-            {/* <Badge variant="primary">附近停車資訊</Badge>
-            <div className="home-hero__title-row">
-              <h1>停哪裡</h1>
-              
-            </div> */}
-            <p className="home-hero__lead">
-              快速找到附近可停車的位置
+          <div className="home-hero__layout">
+            <div className="home-hero__map">
+              <HomeParkingMap
+                parkingLots={pagedParkingLots}
+                streetParkingSpaces={pagedStreetParkingSpaces}
+                userPosition={activePosition}
+              />
+            </div>
+
+            <div className="home-hero__content">
+              <p className="home-hero__lead">
+                快速找到附近可停車的位置
             </p>
             <p className="home-hero__description">
               使用目前位置查看附近停車場與路邊停車格。
@@ -133,13 +148,12 @@ const HomePage = () => {
             <Button
                 className="home-hero__button"
                 disabled={isLoading}
-                onClick={() => {
-                  getCurrentLocation()
-                }}
+                onClick={getCurrentLocation}
                 variant="primary"
               >
                 {isLoading ? '定位中...' : '使用目前位置'}
               </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -160,40 +174,54 @@ const HomePage = () => {
           </Card>
         ) : (
           <>
-            <NearbyParkingSection
-              description={
-                canSortByPosition
-                  ? `共顯示 ${pagedParkingLots.length} 筆停車場，第 ${safeParkingLotPage} / ${totalParkingLotPages} 頁。`
-                  : '顯示目前可用的路外停車場、剩餘車位與收費資訊。'
-              }
-              items={visibleParkingLots}
-              title="附近停車場"
-            >
-              <Pagination
-                className="mt-4"
-                currentPage={safeParkingLotPage}
-                onPageChange={setCurrentParkingLotPage}
-                totalPages={totalParkingLotPages}
-              />
-            </NearbyParkingSection>
+            <div className="parking-category-switcher">
+              <h2>附近停車資訊</h2>
+              <div aria-label="停車資訊分類" className="parking-category-switcher__actions">
+                <Button
+                  onClick={() => handleParkingCategoryChange(PARKING_DISPLAY_CATEGORIES.PARKING_LOTS)}
+                  variant={
+                    activeParkingCategory === PARKING_DISPLAY_CATEGORIES.PARKING_LOTS
+                      ? 'primary'
+                      : 'outline'
+                  }
+                >
+                  停車場
+                </Button>
+                <Button
+                  onClick={() => handleParkingCategoryChange(PARKING_DISPLAY_CATEGORIES.STREET_PARKING)}
+                  variant={
+                    activeParkingCategory === PARKING_DISPLAY_CATEGORIES.STREET_PARKING
+                      ? 'primary'
+                      : 'outline'
+                  }
+                >
+                  路邊停車格
+                </Button>
+              </div>
+            </div>
 
-            <NearbyParkingSection
-              description={
-                canSortByPosition && pagedStreetParkingSpaces.length > 0
-                  ? `共顯示 ${pagedStreetParkingSpaces.length} 筆路邊停車格，第 ${safeStreetParkingPage} / ${totalStreetParkingPages} 頁。`
-                  : '顯示目前可用的路邊停車格與可用格位。'
-              }
-              emptyText={streetParkingEmptyText}
-              items={visibleStreetParkingSpaces}
-              title="附近路邊停車格"
-            >
-              <Pagination
-                className="mt-4"
-                currentPage={safeStreetParkingPage}
-                onPageChange={setCurrentStreetParkingPage}
-                totalPages={totalStreetParkingPages}
-              />
-            </NearbyParkingSection>
+            {activeParkingCategory === PARKING_DISPLAY_CATEGORIES.PARKING_LOTS ? (
+              <NearbyParkingSection items={visibleParkingLots}>
+                <Pagination
+                  className="mt-4"
+                  currentPage={safeParkingLotPage}
+                  onPageChange={setCurrentParkingLotPage}
+                  totalPages={totalParkingLotPages}
+                />
+              </NearbyParkingSection>
+            ) : (
+              <NearbyParkingSection
+                emptyText={streetParkingEmptyText}
+                items={visibleStreetParkingSpaces}
+              >
+                <Pagination
+                  className="mt-4"
+                  currentPage={safeStreetParkingPage}
+                  onPageChange={setCurrentStreetParkingPage}
+                  totalPages={totalStreetParkingPages}
+                />
+              </NearbyParkingSection>
+            )}
           </>
         )}
       </section>
