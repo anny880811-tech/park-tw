@@ -388,6 +388,20 @@ small,
   box-shadow: 0 3px 10px rgba(47, 62, 70, 0.2);
 }
 
+.parking-map-marker--cluster span {
+  width: 2.875rem;
+  height: 2.875rem;
+  color: #FFFFFF;
+  font-size: 0.95rem;
+  font-weight: 800;
+  background: var(--color-secondary);
+  border: 3px solid #FFFFFF;
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 0.35rem rgba(91, 124, 153, 0.18),
+    0 8px 20px rgba(47, 62, 70, 0.24);
+}
+
 .parking-map .leaflet-popup-content-wrapper {
   max-width: calc(100vw - 2rem);
   border-radius: var(--radius-md);
