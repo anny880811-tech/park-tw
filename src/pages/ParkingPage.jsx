@@ -146,11 +146,18 @@ const ParkingPage = () => {
       <section className="container parking-page__content">
         <Card className="parking-search-panel">
           <div className="parking-search-panel__content">
-            <div>
+            <div className="parking-search-panel__heading">
               <h2>搜尋停車場</h2>
-              <p className="mb-0">
-                可嘗試輸入「西屯」、「市政」或「台中」查看前端假資料篩選結果。
-              </p>
+              <Button
+                disabled={isLocationLoading}
+                onClick={() => {
+                  setSelectedLandmark(null)
+                  getCurrentLocation()
+                }}
+                variant="outline"
+              >
+                {isLocationLoading ? '定位中...' : '目前位置'}
+              </Button>
             </div>
             <SearchBar
               buttonText="搜尋"
@@ -169,16 +176,6 @@ const ParkingPage = () => {
                 符合條件的停車場
                 {hasResults ? `，第 ${safeCurrentPage} / ${totalPages} 頁` : ''}
               </span>
-              <Button
-                disabled={isLocationLoading}
-                onClick={() => {
-                  setSelectedLandmark(null)
-                  getCurrentLocation()
-                }}
-                variant="outline"
-              >
-                {isLocationLoading ? '定位中...' : '使用目前位置排序'}
-              </Button>
               {keyword && (
                 <Button
                   className="parking-search-panel__clear"
@@ -189,7 +186,7 @@ const ParkingPage = () => {
                 </Button>
               )}
             </div>
-            <div className="d-flex flex-wrap gap-2">
+            <div className="parking-landmark-shortcuts d-flex flex-wrap gap-2">
               {TEST_LANDMARKS.map((landmark) => (
                 <Button
                   key={landmark.id}

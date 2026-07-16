@@ -37,11 +37,11 @@ const Navbar = () => {
                 停車場
               </NavLink>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <NavLink className={navLinkClassName} to="/about">
                 關於
               </NavLink>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
