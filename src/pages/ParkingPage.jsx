@@ -10,7 +10,7 @@ import { searchParkingLots } from '../services/parkingService.js'
 import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 
 const PARKING_SEARCH_CITY = 'Taichung'
-const PARKING_SEARCH_PAGE_SIZE = 10
+const PARKING_SEARCH_PAGE_SIZE = 12
 
 const filterParkingLotsByKeyword = (parkingLots = [], keyword = '') => {
   const normalizedKeyword = keyword.trim().toLowerCase()

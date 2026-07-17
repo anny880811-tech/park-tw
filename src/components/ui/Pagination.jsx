@@ -12,6 +12,17 @@ const getMobilePages = (currentPage, totalPages) => {
   return [currentPage, currentPage + 1]
 }
 
+const getDesktopPages = (currentPage, totalPages) => {
+  const visiblePageCount = Math.min(totalPages, 5)
+  const maxStartPage = totalPages - visiblePageCount + 1
+  const startPage = Math.max(
+    1,
+    Math.min(currentPage - 2, maxStartPage),
+  )
+
+  return Array.from({ length: visiblePageCount }, (_, index) => startPage + index)
+}
+
 const Pagination = ({
   currentPage,
   totalPages,
@@ -31,7 +42,8 @@ const Pagination = ({
 
   const pages = Array.from({ length: effectiveTotalPages }, (_, index) => index + 1)
   const mobilePages = getMobilePages(effectiveCurrentPage, effectiveTotalPages)
-  const shouldUseDesktopPageSelect = usePageSelect || effectiveTotalPages > MAX_PARKING_PAGES
+  const desktopPages = getDesktopPages(effectiveCurrentPage, effectiveTotalPages)
+  const shouldShowDesktopPageSelect = usePageSelect || effectiveTotalPages > 5
 
   const handlePageChange = (page) => {
     if (page < 1 || page > effectiveTotalPages || page === effectiveCurrentPage) {
@@ -109,22 +121,7 @@ const Pagination = ({
           </button>
         </li>
 
-        {shouldUseDesktopPageSelect ? (
-          <li className="page-item">
-            <select
-              aria-label="選擇頁碼"
-              className="form-select form-select-sm parking-pagination__select"
-              onChange={(event) => handlePageChange(Number(event.target.value))}
-              value={effectiveCurrentPage}
-            >
-              {pages.map((page) => (
-                <option key={page} value={page}>
-                  第 {page} / {effectiveTotalPages} 頁
-                </option>
-              ))}
-            </select>
-          </li>
-        ) : pages.map((page) => (
+        {desktopPages.map((page) => (
           <li
             className={`page-item ${page === effectiveCurrentPage ? 'active' : ''}`}
             key={page}
@@ -140,6 +137,23 @@ const Pagination = ({
             </button>
           </li>
         ))}
+
+        {shouldShowDesktopPageSelect && (
+          <li className="page-item">
+            <select
+              aria-label="選擇頁碼"
+              className="form-select form-select-sm parking-pagination__select"
+              onChange={(event) => handlePageChange(Number(event.target.value))}
+              value={effectiveCurrentPage}
+            >
+              {pages.map((page) => (
+                <option key={page} value={page}>
+                  第 {page} / {effectiveTotalPages} 頁
+                </option>
+              ))}
+            </select>
+          </li>
+        )}
 
         <li className={`page-item ${effectiveCurrentPage === effectiveTotalPages ? 'disabled' : ''}`}>
           <button

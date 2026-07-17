@@ -490,6 +490,12 @@ small,
     min-height: 2rem;
     padding: 0.4rem 0.65rem;
   }
+
+  .parking-map-marker--cluster span {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.8rem;
+  }
 }
 
 .home-page__content {
@@ -596,6 +602,13 @@ small,
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  min-width: 0;
+}
+
+.parking-card__badges .badge {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .parking-card .card-body,
@@ -603,6 +616,7 @@ small,
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  min-width: 0;
 }
 
 .parking-card__details {
@@ -615,6 +629,7 @@ small,
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  min-width: 0;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid rgba(91, 124, 153, 0.1);
 }
@@ -625,11 +640,13 @@ small,
 }
 
 .parking-card__details dt {
+  min-width: 0;
   color: var(--color-text-secondary);
   font-weight: 600;
 }
 
 .parking-card__details dd {
+  min-width: 0;
   margin-bottom: 0;
   color: var(--color-text);
   font-weight: 600;
@@ -747,6 +764,28 @@ small,
   --bs-pagination-hover-border-color: var(--color-primary-hover);
   --bs-pagination-hover-color: var(--color-text);
   max-width: 100%;
+}
+
+.parking-pagination .page-link {
+  border-color: rgba(91, 124, 153, 0.24);
+  color: var(--color-secondary);
+}
+
+.parking-pagination .page-link:hover,
+.parking-pagination .page-link:focus {
+  background: rgba(167, 213, 217, 0.28);
+  border-color: var(--color-primary-hover);
+  color: var(--color-text);
+}
+
+.parking-pagination .page-item.active .page-link {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.parking-pagination .page-link:focus {
+  box-shadow: 0 0 0 0.15rem rgba(127, 195, 202, 0.2);
 }
 
 .parking-pagination__mobile {
@@ -1088,9 +1127,9 @@ small,
   }
 
   .parking-card__details div {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(4.5rem, max-content) minmax(0, 1fr);
     align-items: flex-start;
-    justify-content: space-between;
     gap: 0.75rem;
     padding-bottom: 0.4rem;
   }
@@ -1100,6 +1139,7 @@ small,
   }
 
   .parking-card__details dd {
+    overflow-wrap: anywhere;
     text-align: right;
   }
 

@@ -10,8 +10,10 @@ import {
 } from 'react-leaflet'
 import {
   DEFAULT_MAP_CENTER,
+  DEFAULT_MOBILE_MAP_ZOOM,
   DEFAULT_MAP_ZOOM,
   OPEN_STREET_MAP_TILE_LAYER,
+  USER_LOCATION_MOBILE_ZOOM,
   USER_LOCATION_ZOOM,
 } from '../../constants/map.js'
 import { PARKING_TYPES } from '../../models/parkingModel.js'
@@ -65,6 +67,36 @@ const parkingPopupProps = {
 }
 const CLUSTER_MAX_ZOOM = 16
 const CLUSTER_PIXEL_RADIUS = 48
+const MOBILE_MAP_MEDIA_QUERY = '(max-width: 767.98px)'
+
+const useIsMobileMap = () => {
+  const [isMobileMap, setIsMobileMap] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    return window.matchMedia(MOBILE_MAP_MEDIA_QUERY).matches
+  })
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+
+    const mediaQuery = window.matchMedia(MOBILE_MAP_MEDIA_QUERY)
+    const handleChange = (event) => {
+      setIsMobileMap(event.matches)
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [])
+
+  return isMobileMap
+}
 
 const MapCenterSync = ({ center, zoom }) => {
   const map = useMap()
@@ -243,8 +275,15 @@ const HomeParkingMap = ({
   userPosition,
 }) => {
   const normalizedUserPosition = normalizePosition(userPosition)
+  const isMobileMap = useIsMobileMap()
   const mapCenter = normalizedUserPosition || DEFAULT_MAP_CENTER
-  const mapZoom = normalizedUserPosition ? USER_LOCATION_ZOOM : DEFAULT_MAP_ZOOM
+  const mapZoom = normalizedUserPosition
+    ? isMobileMap
+      ? USER_LOCATION_MOBILE_ZOOM
+      : USER_LOCATION_ZOOM
+    : isMobileMap
+      ? DEFAULT_MOBILE_MAP_ZOOM
+      : DEFAULT_MAP_ZOOM
   const parkingLotMarkers = useMemo(() => {
     return parkingLots
       .map((item, index) => ({
