@@ -16,7 +16,6 @@ const ParkingInfoCard = ({ item }) => {
     totalSpaces,
     availableSpaces,
     price,
-    isOpen,
     vehicleTypes = [],
     availableSpacesByVehicleType = {},
     features = [],
@@ -25,7 +24,6 @@ const ParkingInfoCard = ({ item }) => {
   } = item
   const hasAvailableSpaces = Number.isFinite(availableSpaces)
   const hasSpaces = hasAvailableSpaces && availableSpaces > 0
-  const hasOpenStatus = typeof isOpen === 'boolean'
   const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude)
   const isStreetParking = type === PARKING_TYPES.STREET || Boolean(road)
   const locationText = address || road
@@ -34,7 +32,6 @@ const ParkingInfoCard = ({ item }) => {
     : isStreetParking
       ? '僅提供收費路段，無即時格位'
       : '未提供即時資訊'
-  const openStatus = isOpen === false ? '未營業' : '營業中'
   const distanceText = displayDistance || (
     Number.isFinite(distance) ? formatDistance(distance) : ''
   )
@@ -56,11 +53,6 @@ const ParkingInfoCard = ({ item }) => {
         {hasAvailableSpaces && (
           <Badge variant={hasSpaces ? 'success' : 'danger'}>
             {hasSpaces ? '尚有車位' : '已滿'}
-          </Badge>
-        )}
-        {hasOpenStatus && (
-          <Badge variant={isOpen === false ? 'secondary' : 'primary'}>
-            {openStatus}
           </Badge>
         )}
         {features.map((feature) => (

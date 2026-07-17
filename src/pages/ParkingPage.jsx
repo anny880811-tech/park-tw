@@ -7,6 +7,7 @@ import Card from '../components/ui/Card.jsx'
 import Pagination from '../components/ui/Pagination.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
 import { searchParkingLots } from '../services/parkingService.js'
+import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
 import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 
 const PARKING_SEARCH_CITY = 'Taichung'
@@ -101,6 +102,10 @@ const ParkingPage = () => {
     setSelectedVehicleType(vehicleType)
     setCurrentPage(1)
   }
+  const handleSelectLandmark = (landmark) => {
+    setKeyword(landmark.name)
+    setCurrentPage(1)
+  }
 
   return (
     <div className="parking-page">
@@ -132,10 +137,20 @@ const ParkingPage = () => {
               onChange={handleVehicleTypeChange}
               value={selectedVehicleType}
             />
+            <div className="parking-landmark-shortcuts d-flex flex-wrap gap-2">
+              {TEST_LANDMARKS.map((landmark) => (
+                <Button
+                  key={landmark.id}
+                  onClick={() => handleSelectLandmark(landmark)}
+                  variant={keyword === landmark.name ? 'secondary' : 'outline'}
+                >
+                  {landmark.name}
+                </Button>
+              ))}
+            </div>
             <div className="parking-search-panel__meta">
               <span>
-                共 {filteredParkingLots.length} 筆符合條件的台中市停車場
-                {hasResults ? `，第 ${safeCurrentPage} / ${totalPages} 頁` : ''}
+                共 {filteredParkingLots.length} 筆符合條件
               </span>
               {keyword && (
                 <Button
