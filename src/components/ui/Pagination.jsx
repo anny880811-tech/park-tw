@@ -17,8 +17,12 @@ const Pagination = ({
   totalPages,
   onPageChange,
   className = '',
+  maxPages = MAX_PARKING_PAGES,
+  usePageSelect = false,
 }) => {
-  const effectiveTotalPages = Math.min(totalPages, MAX_PARKING_PAGES)
+  const effectiveTotalPages = maxPages
+    ? Math.min(totalPages, maxPages)
+    : totalPages
   const effectiveCurrentPage = Math.min(currentPage, effectiveTotalPages)
 
   if (effectiveTotalPages <= 1) {
@@ -27,6 +31,7 @@ const Pagination = ({
 
   const pages = Array.from({ length: effectiveTotalPages }, (_, index) => index + 1)
   const mobilePages = getMobilePages(effectiveCurrentPage, effectiveTotalPages)
+  const shouldUseDesktopPageSelect = usePageSelect || effectiveTotalPages > MAX_PARKING_PAGES
 
   const handlePageChange = (page) => {
     if (page < 1 || page > effectiveTotalPages || page === effectiveCurrentPage) {
@@ -91,7 +96,7 @@ const Pagination = ({
         </button>
       </div>
 
-      <ul className="pagination justify-content-center mb-0 gap-1 d-none d-md-flex">
+      <ul className="pagination justify-content-center align-items-center mb-0 gap-1 d-none d-md-flex">
         <li className={`page-item ${effectiveCurrentPage === 1 ? 'disabled' : ''}`}>
           <button
             aria-label="上一頁"
@@ -104,7 +109,22 @@ const Pagination = ({
           </button>
         </li>
 
-        {pages.map((page) => (
+        {shouldUseDesktopPageSelect ? (
+          <li className="page-item">
+            <select
+              aria-label="選擇頁碼"
+              className="form-select form-select-sm parking-pagination__select"
+              onChange={(event) => handlePageChange(Number(event.target.value))}
+              value={effectiveCurrentPage}
+            >
+              {pages.map((page) => (
+                <option key={page} value={page}>
+                  第 {page} / {effectiveTotalPages} 頁
+                </option>
+              ))}
+            </select>
+          </li>
+        ) : pages.map((page) => (
           <li
             className={`page-item ${page === effectiveCurrentPage ? 'active' : ''}`}
             key={page}

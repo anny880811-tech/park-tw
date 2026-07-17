@@ -34,6 +34,16 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <NavLink className={navLinkClassName} to="/parking">
+                <svg
+                  aria-hidden="true"
+                  className="nav-link__icon"
+                  fill="none"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="11" cy="11" r="6" />
+                  <path d="m16 16 4 4" />
+                </svg>
                 停車場
               </NavLink>
             </li>

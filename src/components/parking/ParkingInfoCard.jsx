@@ -33,7 +33,7 @@ const ParkingInfoCard = ({ item }) => {
     ? availableSpaces
     : isStreetParking
       ? '僅提供收費路段，無即時格位'
-      : '資料未提供'
+      : '未提供即時資訊'
   const openStatus = isOpen === false ? '未營業' : '營業中'
   const distanceText = displayDistance || (
     Number.isFinite(distance) ? formatDistance(distance) : ''
@@ -53,9 +53,11 @@ const ParkingInfoCard = ({ item }) => {
   return (
     <Card className="parking-card" subtitle={locationText} title={name}>
       <div className="parking-card__badges">
-        <Badge variant={hasAvailableSpaces ? (hasSpaces ? 'success' : 'danger') : 'secondary'}>
-          {hasAvailableSpaces ? (hasSpaces ? '尚有車位' : '已滿') : '未提供即時空位'}
-        </Badge>
+        {hasAvailableSpaces && (
+          <Badge variant={hasSpaces ? 'success' : 'danger'}>
+            {hasSpaces ? '尚有車位' : '已滿'}
+          </Badge>
+        )}
         {hasOpenStatus && (
           <Badge variant={isOpen === false ? 'secondary' : 'primary'}>
             {openStatus}

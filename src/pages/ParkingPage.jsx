@@ -6,15 +6,11 @@ import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
 import Pagination from '../components/ui/Pagination.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
-import useGeolocation from '../hooks/useGeolocation.js'
 import { searchParkingLots } from '../services/parkingService.js'
-import {
-  MAX_PARKING_PAGES,
-  MAX_PARKING_RESULTS,
-  PARKING_PAGE_SIZE,
-} from '../constants/pagination.js'
-import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
 import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
+
+const PARKING_SEARCH_CITY = 'Taichung'
+const PARKING_SEARCH_PAGE_SIZE = 10
 
 const filterParkingLotsByKeyword = (parkingLots = [], keyword = '') => {
   const normalizedKeyword = keyword.trim().toLowerCase()
@@ -39,30 +35,17 @@ const ParkingPage = () => {
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
-  const [selectedLandmark, setSelectedLandmark] = useState(null)
   const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
-  const {
-    status: locationStatus,
-    position,
-    getCurrentLocation,
-  } = useGeolocation()
-  const isLocationLoading = locationStatus === 'loading'
-  const activePosition = selectedLandmark || (locationStatus === 'success' ? position : null)
-  const activeCity = selectedLandmark?.city
   const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
-  const pagedParkingLots = filteredParkingLots.slice(0, MAX_PARKING_RESULTS)
   const hasResults = filteredParkingLots.length > 0
-  const totalPages = Math.min(
-    Math.ceil(pagedParkingLots.length / PARKING_PAGE_SIZE),
-    MAX_PARKING_PAGES,
-  )
+  const totalPages = Math.ceil(filteredParkingLots.length / PARKING_SEARCH_PAGE_SIZE)
   const safeCurrentPage = totalPages > 0
     ? Math.min(currentPage, totalPages)
     : 1
-  const startIndex = (safeCurrentPage - 1) * PARKING_PAGE_SIZE
-  const visibleParkingLots = pagedParkingLots.slice(
+  const startIndex = (safeCurrentPage - 1) * PARKING_SEARCH_PAGE_SIZE
+  const visibleParkingLots = filteredParkingLots.slice(
     startIndex,
-    startIndex + PARKING_PAGE_SIZE,
+    startIndex + PARKING_SEARCH_PAGE_SIZE,
   )
 
   useEffect(() => {
@@ -72,16 +55,10 @@ const ParkingPage = () => {
       setIsDataLoading(true)
 
       try {
-        const locationParams = activePosition
-          ? {
-              city: activeCity,
-              latitude: activePosition.latitude,
-              longitude: activePosition.longitude,
-              vehicleType: selectedVehicleType,
-            }
-          : {
-              vehicleType: selectedVehicleType,
-            }
+        const locationParams = {
+          city: PARKING_SEARCH_CITY,
+          vehicleType: selectedVehicleType,
+        }
         const result = await searchParkingLots(locationParams)
 
         if (isActive) {
@@ -104,7 +81,7 @@ const ParkingPage = () => {
     return () => {
       isActive = false
     }
-  }, [activeCity, activePosition, selectedVehicleType])
+  }, [selectedVehicleType])
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
@@ -122,10 +99,6 @@ const ParkingPage = () => {
   }
   const handleVehicleTypeChange = (vehicleType) => {
     setSelectedVehicleType(vehicleType)
-    setCurrentPage(1)
-  }
-  const handleSelectLandmark = (landmark) => {
-    setSelectedLandmark(landmark)
     setCurrentPage(1)
   }
 
@@ -147,16 +120,6 @@ const ParkingPage = () => {
           <div className="parking-search-panel__content">
             <div className="parking-search-panel__heading">
               <h2>搜尋停車場</h2>
-              <Button
-                disabled={isLocationLoading}
-                onClick={() => {
-                  setSelectedLandmark(null)
-                  getCurrentLocation()
-                }}
-                variant="outline"
-              >
-                {isLocationLoading ? '定位中...' : '目前位置'}
-              </Button>
             </div>
             <SearchBar
               buttonText="搜尋"
@@ -171,8 +134,7 @@ const ParkingPage = () => {
             />
             <div className="parking-search-panel__meta">
               <span>
-                共顯示 {pagedParkingLots.length} 筆以內的
-                符合條件的停車場
+                共 {filteredParkingLots.length} 筆符合條件的台中市停車場
                 {hasResults ? `，第 ${safeCurrentPage} / ${totalPages} 頁` : ''}
               </span>
               {keyword && (
@@ -185,17 +147,6 @@ const ParkingPage = () => {
                 </Button>
               )}
             </div>
-            <div className="parking-landmark-shortcuts d-flex flex-wrap gap-2">
-              {TEST_LANDMARKS.map((landmark) => (
-                <Button
-                  key={landmark.id}
-                  onClick={() => handleSelectLandmark(landmark)}
-                  variant={selectedLandmark?.id === landmark.id ? 'secondary' : 'outline'}
-                >
-                  {landmark.name}
-                </Button>
-              ))}
-            </div>
           </div>
         </Card>
 
@@ -207,9 +158,9 @@ const ParkingPage = () => {
                 依目前關鍵字顯示符合條件的停車場。
               </p>
             </div>
-            <div className="row g-4">
+            <div className="parking-results__grid">
               {visibleParkingLots.map((item) => (
-                <div className="col-12 col-md-6 col-xl-4" key={item.id}>
+                <div key={item.id}>
                   <ParkingInfoCard item={item} />
                 </div>
               ))}
@@ -217,8 +168,10 @@ const ParkingPage = () => {
             <Pagination
               className="mt-4"
               currentPage={safeCurrentPage}
+              maxPages={null}
               onPageChange={setCurrentPage}
               totalPages={totalPages}
+              usePageSelect
             />
           </section>
         ) : (
