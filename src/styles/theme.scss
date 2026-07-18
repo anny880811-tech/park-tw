@@ -190,16 +190,23 @@ small,
 }
 
 .ui-card {
+  max-width: 100%;
+  min-width: 0;
   overflow: hidden;
 }
 
 .ui-card__header {
+  max-width: 100%;
+  min-width: 0;
   margin-bottom: 1rem;
 }
 
 .ui-card__title {
+  max-width: 100%;
   margin-bottom: 0.35rem;
   font-size: 1.2rem;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .ui-card__subtitle {
@@ -810,6 +817,8 @@ small,
 }
 
 .parking-results__grid .parking-card {
+  max-width: 100%;
+  min-width: 0;
   width: 100%;
 }
 
@@ -1045,6 +1054,7 @@ small,
   }
 
   .search-bar {
+    flex-direction: column !important;
     gap: 0.375rem !important;
   }
 
@@ -1233,15 +1243,18 @@ small,
 
   .parking-card__details div {
     display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: flex-start;
     gap: 0.2rem 1rem;
+    max-width: 100%;
     padding-bottom: 0.4rem;
   }
 
   .parking-card__details dt {
     flex: 0 0 auto;
-    white-space: nowrap;
+    max-width: 5.5rem;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .parking-card__details dd {
