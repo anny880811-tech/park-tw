@@ -270,14 +270,16 @@ const ParkingMarkers = ({ parkingLotMarkers, streetParkingMarkers }) => {
 }
 
 const HomeParkingMap = ({
+  focusPosition,
   parkingLots = [],
   streetParkingSpaces = [],
   userPosition,
 }) => {
   const normalizedUserPosition = normalizePosition(userPosition)
+  const normalizedFocusPosition = normalizePosition(focusPosition)
   const isMobileMap = useIsMobileMap()
-  const mapCenter = normalizedUserPosition || DEFAULT_MAP_CENTER
-  const mapZoom = normalizedUserPosition
+  const mapCenter = normalizedFocusPosition || DEFAULT_MAP_CENTER
+  const mapZoom = normalizedFocusPosition
     ? isMobileMap
       ? USER_LOCATION_MOBILE_ZOOM
       : USER_LOCATION_ZOOM

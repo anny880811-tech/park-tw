@@ -269,9 +269,19 @@ small,
   display: grid;
   grid-template-areas:
     "lead"
+    "mode"
     "map"
     "button";
   gap: 1rem;
+}
+
+.home-hero__layout--attractions {
+  grid-template-areas:
+    "lead"
+    "mode"
+    "landmarks"
+    "map"
+    "button";
 }
 
 .home-section__header h2 {
@@ -309,18 +319,51 @@ small,
   grid-area: button;
 }
 
+.home-hero__mode-switcher,
+.home-hero__landmarks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.home-hero__mode-switcher {
+  grid-area: mode;
+}
+
+.home-hero__landmarks {
+  grid-area: landmarks;
+}
+
+.home-hero__mode-switcher .btn,
+.home-hero__landmarks .btn {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+}
+
 @media (min-width: 768px) {
   .home-hero__layout {
     grid-template-areas:
-      "lead button ."
+      "lead button mode"
       "map map map";
     grid-template-columns: max-content max-content 1fr;
     align-items: center;
     gap: 1rem;
   }
 
+  .home-hero__layout--attractions {
+    grid-template-areas:
+      "lead button mode"
+      "landmarks landmarks landmarks"
+      "map map map";
+  }
+
   .home-hero__lead {
     font-size: 2rem;
+  }
+
+  .home-hero__mode-switcher {
+    justify-content: flex-end;
   }
 }
 
