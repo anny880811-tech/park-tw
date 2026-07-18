@@ -64,18 +64,18 @@ const ParkingInfoCard = ({ item }) => {
 
       <dl className="parking-card__details">
         {vehicleTypeLabels.length > 0 && (
-          <div>
+          <div className="parking-card__detail-row parking-card__detail-row--inline">
             <dt>支援車種</dt>
             <dd>{vehicleTypeLabels.join('、')}</dd>
           </div>
         )}
         {distanceText && (
-          <div>
+          <div className="parking-card__detail-row parking-card__detail-row--inline">
             <dt>距離</dt>
             <dd>{distanceText}</dd>
           </div>
         )}
-        <div>
+        <div className="parking-card__detail-row parking-card__detail-row--inline">
           <dt>剩餘車位</dt>
           <dd>
             {availableSpacesText}
@@ -83,12 +83,12 @@ const ParkingInfoCard = ({ item }) => {
           </dd>
         </div>
         {vehicleSpacesText && (
-          <div>
+          <div className="parking-card__detail-row">
             <dt>分車種剩餘</dt>
             <dd>{vehicleSpacesText}</dd>
           </div>
         )}
-        <div>
+        <div className="parking-card__detail-row parking-card__detail-row--inline">
           <dt>收費</dt>
           <dd>{price}</dd>
         </div>

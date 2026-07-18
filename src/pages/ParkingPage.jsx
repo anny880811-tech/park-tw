@@ -7,7 +7,10 @@ import Card from '../components/ui/Card.jsx'
 import Pagination from '../components/ui/Pagination.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
 import { searchParkingLots } from '../services/parkingService.js'
-import { TEST_LANDMARKS } from '../constants/testLandmarks.js'
+import {
+  findSearchLandmarkByKeyword,
+  TEST_LANDMARKS,
+} from '../constants/testLandmarks.js'
 import { VEHICLE_FILTERS } from '../constants/vehicleTypes.js'
 
 const PARKING_SEARCH_CITY = 'Taichung'
@@ -38,6 +41,8 @@ const ParkingPage = () => {
   const [parkingLots, setParkingLots] = useState([])
   const [selectedLandmark, setSelectedLandmark] = useState(null)
   const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
+  const isLandmarkSearch = Boolean(selectedLandmark)
+  const isKeywordSearch = Boolean(keyword.trim())
   const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
   const hasResults = filteredParkingLots.length > 0
   const totalPages = Math.ceil(filteredParkingLots.length / PARKING_SEARCH_PAGE_SIZE)
@@ -99,7 +104,19 @@ const ParkingPage = () => {
   }
 
   const handleSearchSubmit = () => {
-    setKeyword((currentKeyword) => currentKeyword.trim())
+    const trimmedKeyword = keyword.trim()
+    const matchedLandmark = findSearchLandmarkByKeyword(trimmedKeyword)
+
+    if (matchedLandmark) {
+      setKeyword('')
+      setSelectedLandmark(matchedLandmark)
+      setCurrentPage(1)
+
+      return
+    }
+
+    setKeyword(trimmedKeyword)
+    setSelectedLandmark(null)
     setCurrentPage(1)
   }
 
@@ -182,7 +199,11 @@ const ParkingPage = () => {
             <div className="parking-results__header">
               <h2>停車場列表</h2>
               <p className="mb-0">
-                依目前關鍵字顯示符合條件的停車場。
+                {isLandmarkSearch
+                  ? `依距離顯示${selectedLandmark.name}附近可停車的位置。`
+                  : isKeywordSearch
+                    ? `依目前關鍵字「${keyword.trim()}」顯示符合條件的停車場。`
+                    : '顯示全台中市停車場。'}
               </p>
             </div>
             <div className="parking-results__grid">

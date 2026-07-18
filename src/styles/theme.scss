@@ -203,8 +203,11 @@ small,
 }
 
 .ui-card__subtitle {
+  max-width: 100%;
   margin-bottom: 0;
   color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .ui-card__content > :last-child {
@@ -1061,12 +1064,12 @@ small,
   }
 
   .home-hero__lead {
-    text-align: center;
+    text-align: left;
   }
 
   .home-hero__mode-switcher,
   .home-hero__landmarks {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .home-hero__layout--attractions {
@@ -1140,6 +1143,16 @@ small,
   }
 
   .parking-results__grid .parking-card {
+    max-width: 100%;
+  }
+
+  .home-section .row > * {
+    display: flex;
+    justify-content: center;
+  }
+
+  .home-section .parking-card {
+    width: 100%;
     max-width: 100%;
   }
 
@@ -1220,18 +1233,25 @@ small,
 
   .parking-card__details div {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: max-content minmax(0, 1fr);
     align-items: flex-start;
-    gap: 0.2rem;
+    gap: 0.2rem 1rem;
     padding-bottom: 0.4rem;
   }
 
   .parking-card__details dt {
     flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .parking-card__details dd {
     overflow-wrap: anywhere;
+    text-align: left;
+  }
+
+  .parking-card__detail-row--inline dd {
+    justify-self: end;
+    max-width: 100%;
     text-align: left;
   }
 
