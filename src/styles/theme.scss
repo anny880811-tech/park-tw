@@ -1275,3 +1275,93 @@ small,
     font-size: 0.875rem;
   }
 }
+
+@media (max-width: 430px) {
+  .container {
+    width: min(100% - 1rem, 1120px);
+  }
+
+  .parking-page__content {
+    gap: 1rem;
+    padding-top: 1rem;
+  }
+
+  .parking-search-panel .card-body {
+    padding: 0.75rem;
+  }
+
+  .parking-search-panel__content {
+    gap: 0.625rem;
+  }
+
+  .parking-search-panel__meta {
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+  }
+
+  .parking-landmark-shortcuts .btn {
+    max-width: 100%;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.8rem;
+    white-space: normal;
+  }
+
+  .parking-results__grid {
+    gap: 0.75rem;
+  }
+
+  .parking-card .card-body {
+    padding: 0.75rem;
+  }
+
+  .parking-card .ui-card__title {
+    font-size: 0.95rem;
+  }
+
+  .parking-card__details {
+    font-size: 0.8125rem;
+  }
+
+  .parking-card__details div {
+    grid-template-columns: minmax(4.25rem, auto) minmax(0, 1fr);
+    gap: 0.2rem 0.5rem;
+  }
+
+  .parking-card__details dt,
+  .parking-card__details dd {
+    min-width: 0;
+  }
+
+  .parking-card__details dt {
+    max-width: 4.75rem;
+  }
+
+  .parking-card__detail-row--inline dd {
+    max-width: 100%;
+  }
+
+  .parking-card__directions {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    white-space: normal;
+  }
+
+  .parking-pagination__mobile {
+    flex-wrap: wrap !important;
+    justify-content: center;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    row-gap: 0.4rem;
+  }
+
+  .parking-pagination__button {
+    padding-left: 0.45rem;
+    padding-right: 0.45rem;
+    font-size: 0.8125rem;
+  }
+
+  .parking-pagination__select {
+    max-width: 7.5rem;
+    font-size: 0.8125rem;
+  }
+}
