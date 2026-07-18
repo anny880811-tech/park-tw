@@ -18,6 +18,10 @@ import {
 } from '../../constants/map.js'
 import { PARKING_TYPES } from '../../models/parkingModel.js'
 import { normalizePosition } from '../../utils/coordinates.js'
+import {
+  calculateDistanceInMeters,
+  formatDistance,
+} from '../../utils/distance.js'
 import { getGoogleMapsDirectionsUrl } from '../../utils/navigation.js'
 
 const createMapIcon = ({ className, html, iconAnchor, iconSize, popupAnchor }) => {
@@ -130,6 +134,23 @@ const getAvailableSpacesText = (item) => {
   return '資料未提供'
 }
 
+const getPriceText = (item) => {
+  return (
+    item.price
+    || item.rawItem?.FareDescription
+    || item.rawItem?.ChargeDescription
+    || '未提供收費資訊'
+  )
+}
+
+const getDisplayDistanceText = (item, markerPosition, focusPosition) => {
+  if (item.displayDistance) {
+    return item.displayDistance
+  }
+
+  return formatDistance(calculateDistanceInMeters(focusPosition, markerPosition))
+}
+
 const getMarkerKey = (item, index) => {
   return `${item.type || 'parking'}-${item.id || item.sectionId || item.spaceId || index}`
 }
@@ -193,7 +214,7 @@ const createParkingMarkerClusters = (markers, map, zoom) => {
   }))
 }
 
-const ParkingMarkerPopup = ({ item, position }) => (
+const ParkingMarkerPopup = ({ focusPosition, item, position }) => (
   <Popup {...parkingPopupProps}>
     <div className="parking-map__popup">
       <strong className="parking-map__popup-title">{item.name || '停車位置'}</strong>
@@ -201,11 +222,16 @@ const ParkingMarkerPopup = ({ item, position }) => (
       {(item.address || item.road) && (
         <span className="parking-map__popup-address">{item.address || item.road}</span>
       )}
-      {item.displayDistance && (
-        <span className="parking-map__popup-meta">距離：{item.displayDistance}</span>
-      )}
+      <div className="parking-map__popup-meta-row">
+        <span className="parking-map__popup-meta">
+          距離：{getDisplayDistanceText(item, position, focusPosition)}
+        </span>
+        <span className="parking-map__popup-meta">
+          剩餘車位：{getAvailableSpacesText(item)}
+        </span>
+      </div>
       <span className="parking-map__popup-meta">
-        剩餘車位：{getAvailableSpacesText(item)}
+        收費：{getPriceText(item)}
       </span>
       <a
         className="parking-map__popup-directions"
@@ -219,7 +245,7 @@ const ParkingMarkerPopup = ({ item, position }) => (
   </Popup>
 )
 
-const ParkingMarkers = ({ parkingLotMarkers, streetParkingMarkers }) => {
+const ParkingMarkers = ({ focusPosition, parkingLotMarkers, streetParkingMarkers }) => {
   const map = useMap()
   const [mapZoom, setMapZoom] = useState(map.getZoom())
 
@@ -263,7 +289,11 @@ const ParkingMarkers = ({ parkingLotMarkers, streetParkingMarkers }) => {
         key={marker.key}
         position={[marker.position.latitude, marker.position.longitude]}
       >
-        <ParkingMarkerPopup item={marker.item} position={marker.position} />
+        <ParkingMarkerPopup
+          focusPosition={focusPosition}
+          item={marker.item}
+          position={marker.position}
+        />
       </Marker>
     )
   })
@@ -330,6 +360,7 @@ const HomeParkingMap = ({
       )}
 
       <ParkingMarkers
+        focusPosition={normalizedFocusPosition}
         parkingLotMarkers={parkingLotMarkers}
         streetParkingMarkers={streetParkingMarkers}
       />

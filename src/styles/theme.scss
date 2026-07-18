@@ -268,20 +268,11 @@ small,
 .home-hero__layout {
   display: grid;
   grid-template-areas:
-    "lead"
     "mode"
+    "lead"
     "map"
     "button";
   gap: 1rem;
-}
-
-.home-hero__layout--attractions {
-  grid-template-areas:
-    "lead"
-    "mode"
-    "landmarks"
-    "map"
-    "button";
 }
 
 .home-section__header h2 {
@@ -332,7 +323,7 @@ small,
 }
 
 .home-hero__landmarks {
-  grid-area: landmarks;
+  grid-area: lead;
 }
 
 .home-hero__mode-switcher .btn,
@@ -349,13 +340,6 @@ small,
     grid-template-columns: max-content max-content 1fr;
     align-items: center;
     gap: 1rem;
-  }
-
-  .home-hero__layout--attractions {
-    grid-template-areas:
-      "lead button mode"
-      "landmarks landmarks landmarks"
-      "map map map";
   }
 
   .home-hero__lead {
@@ -496,6 +480,13 @@ small,
 
 .parking-map__popup-address,
 .parking-map__popup-meta {
+  min-width: 0;
+}
+
+.parking-map__popup-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
   min-width: 0;
 }
 
@@ -815,6 +806,10 @@ small,
   min-width: 0;
 }
 
+.parking-results__grid .parking-card {
+  width: 100%;
+}
+
 .empty-state__content {
   display: grid;
   gap: 0.75rem;
@@ -1065,6 +1060,26 @@ small,
     gap: 0.5rem;
   }
 
+  .home-hero__lead {
+    text-align: center;
+  }
+
+  .home-hero__mode-switcher,
+  .home-hero__landmarks {
+    justify-content: center;
+  }
+
+  .home-hero__layout--attractions {
+    grid-template-areas:
+      "mode"
+      "map"
+      "button";
+  }
+
+  .home-hero__layout--attractions .home-hero__landmarks {
+    grid-area: button;
+  }
+
   .home-hero__button {
     margin-top: 0.5rem;
     width: 100%;
@@ -1117,6 +1132,15 @@ small,
 
   .parking-results__grid {
     gap: 1rem;
+  }
+
+  .parking-results__grid > * {
+    display: flex;
+    justify-content: center;
+  }
+
+  .parking-results__grid .parking-card {
+    max-width: 100%;
   }
 
   .parking-category-switcher {
@@ -1196,9 +1220,9 @@ small,
 
   .parking-card__details div {
     display: grid;
-    grid-template-columns: minmax(4.5rem, max-content) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.2rem;
     padding-bottom: 0.4rem;
   }
 
@@ -1208,7 +1232,7 @@ small,
 
   .parking-card__details dd {
     overflow-wrap: anywhere;
-    text-align: right;
+    text-align: left;
   }
 
   .parking-card__directions {

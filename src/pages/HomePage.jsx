@@ -143,12 +143,16 @@ const HomePage = () => {
   const handleParkingCategoryChange = (category) => {
     setActiveParkingCategory(category)
   }
-  const handleHeroModeChange = (mode) => {
-    setActiveHeroMode(mode)
+  const handleHeroModeToggle = () => {
+    const nextMode = activeHeroMode === HOME_HERO_MODES.ATTRACTIONS
+      ? HOME_HERO_MODES.NEARBY
+      : HOME_HERO_MODES.ATTRACTIONS
+
+    setActiveHeroMode(nextMode)
     setCurrentParkingLotPage(1)
     setCurrentStreetParkingPage(1)
 
-    if (mode === HOME_HERO_MODES.NEARBY) {
+    if (nextMode === HOME_HERO_MODES.NEARBY) {
       setSelectedLandmark(null)
     }
   }
@@ -181,40 +185,7 @@ const HomePage = () => {
                 : '',
             ].filter(Boolean).join(' ')}
           >
-            <p className="home-hero__lead">
-              快速找到附近可停車的位置
-            </p>
-            <div aria-label="首頁搜尋模式" className="home-hero__mode-switcher">
-              <Button
-                onClick={() => handleHeroModeChange(HOME_HERO_MODES.NEARBY)}
-                variant={activeHeroMode === HOME_HERO_MODES.NEARBY ? 'primary' : 'outline'}
-              >
-                搜尋附近
-              </Button>
-              <Button
-                onClick={() => handleHeroModeChange(HOME_HERO_MODES.ATTRACTIONS)}
-                variant={activeHeroMode === HOME_HERO_MODES.ATTRACTIONS ? 'primary' : 'outline'}
-              >
-                台中熱門景點
-              </Button>
-            </div>
-            <div className="home-hero__map">
-              <HomeParkingMap
-                focusPosition={activePosition}
-                parkingLots={mapParkingLots}
-                streetParkingSpaces={mapStreetParkingSpaces}
-                userPosition={currentPosition}
-              />
-            </div>
-            <Button
-              className="home-hero__button"
-              disabled={isLoading}
-              onClick={handleCurrentLocationClick}
-              variant="primary"
-            >
-              {isLoading ? '定位中...' : '使用目前位置'}
-            </Button>
-            {activeHeroMode === HOME_HERO_MODES.ATTRACTIONS && (
+            {activeHeroMode === HOME_HERO_MODES.ATTRACTIONS ? (
               <div aria-label="台中熱門景點" className="home-hero__landmarks">
                 {TEST_LANDMARKS.map((landmark) => (
                   <Button
@@ -226,6 +197,36 @@ const HomePage = () => {
                   </Button>
                 ))}
               </div>
+            ) : (
+              <p className="home-hero__lead">
+                快速找到附近可停車的位置
+              </p>
+            )}
+            <div aria-label="首頁搜尋模式" className="home-hero__mode-switcher">
+              <Button
+                onClick={handleHeroModeToggle}
+                variant={activeHeroMode === HOME_HERO_MODES.ATTRACTIONS ? 'primary' : 'outline'}
+              >
+                {activeHeroMode === HOME_HERO_MODES.ATTRACTIONS ? '搜尋附近' : '熱門景點'}
+              </Button>
+            </div>
+            <div className="home-hero__map">
+              <HomeParkingMap
+                focusPosition={activePosition}
+                parkingLots={mapParkingLots}
+                streetParkingSpaces={mapStreetParkingSpaces}
+                userPosition={currentPosition}
+              />
+            </div>
+            {activeHeroMode === HOME_HERO_MODES.NEARBY && (
+              <Button
+                className="home-hero__button"
+                disabled={isLoading}
+                onClick={handleCurrentLocationClick}
+                variant="primary"
+              >
+                {isLoading ? '定位中...' : '使用目前位置'}
+              </Button>
             )}
           </div>
         </div>

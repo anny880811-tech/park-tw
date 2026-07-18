@@ -36,6 +36,7 @@ const ParkingPage = () => {
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [parkingLots, setParkingLots] = useState([])
+  const [selectedLandmark, setSelectedLandmark] = useState(null)
   const [selectedVehicleType, setSelectedVehicleType] = useState(VEHICLE_FILTERS.ALL)
   const filteredParkingLots = filterParkingLotsByKeyword(parkingLots, keyword)
   const hasResults = filteredParkingLots.length > 0
@@ -56,10 +57,17 @@ const ParkingPage = () => {
       setIsDataLoading(true)
 
       try {
-        const locationParams = {
-          city: PARKING_SEARCH_CITY,
-          vehicleType: selectedVehicleType,
-        }
+        const locationParams = selectedLandmark
+          ? {
+              city: selectedLandmark.city || PARKING_SEARCH_CITY,
+              latitude: selectedLandmark.latitude,
+              longitude: selectedLandmark.longitude,
+              vehicleType: selectedVehicleType,
+            }
+          : {
+              city: PARKING_SEARCH_CITY,
+              vehicleType: selectedVehicleType,
+            }
         const result = await searchParkingLots(locationParams)
 
         if (isActive) {
@@ -82,10 +90,11 @@ const ParkingPage = () => {
     return () => {
       isActive = false
     }
-  }, [selectedVehicleType])
+  }, [selectedLandmark, selectedVehicleType])
 
   const handleKeywordChange = (event) => {
     setKeyword(event.target.value)
+    setSelectedLandmark(null)
     setCurrentPage(1)
   }
 
@@ -96,6 +105,7 @@ const ParkingPage = () => {
 
   const handleClearKeyword = () => {
     setKeyword('')
+    setSelectedLandmark(null)
     setCurrentPage(1)
   }
   const handleVehicleTypeChange = (vehicleType) => {
@@ -103,7 +113,8 @@ const ParkingPage = () => {
     setCurrentPage(1)
   }
   const handleSelectLandmark = (landmark) => {
-    setKeyword(landmark.name)
+    setKeyword('')
+    setSelectedLandmark(landmark)
     setCurrentPage(1)
   }
 
@@ -142,7 +153,7 @@ const ParkingPage = () => {
                 <Button
                   key={landmark.id}
                   onClick={() => handleSelectLandmark(landmark)}
-                  variant={keyword === landmark.name ? 'secondary' : 'outline'}
+                  variant={selectedLandmark?.id === landmark.id ? 'secondary' : 'outline'}
                 >
                   {landmark.name}
                 </Button>
@@ -151,8 +162,9 @@ const ParkingPage = () => {
             <div className="parking-search-panel__meta">
               <span>
                 共 {filteredParkingLots.length} 筆符合條件
+                {selectedLandmark ? `，${selectedLandmark.name} 附近` : ''}
               </span>
-              {keyword && (
+              {(keyword || selectedLandmark) && (
                 <Button
                   className="parking-search-panel__clear"
                   onClick={handleClearKeyword}
