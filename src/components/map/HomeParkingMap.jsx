@@ -239,7 +239,7 @@ const ParkingMarkerPopup = ({ focusPosition, item, position }) => (
         rel="noopener noreferrer"
         target="_blank"
       >
-        前往停車場
+        開啟 Google Maps
       </a>
     </div>
   </Popup>

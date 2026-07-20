@@ -8,9 +8,9 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-md site-navbar">
       <div className="container">
-        <Link className="navbar-brand brand-logo" to="/" aria-label="停哪裡首頁">
+        <Link className="navbar-brand brand-logo" to="/" aria-label="台中好停首頁">
           <span className="brand-logo__mark">停</span>
-          <span className="brand-logo__name">停哪裡</span>
+          <span className="brand-logo__name">台中好停</span>
         </Link>
 
         <button

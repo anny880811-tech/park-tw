@@ -101,7 +101,7 @@ const ParkingInfoCard = ({ item }) => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          前往停車場
+          開啟 Google Maps
         </a>
       )}
     </Card>

@@ -185,7 +185,12 @@ const HomePage = () => {
                 : '',
             ].filter(Boolean).join(' ')}
           >
-            {activeHeroMode === HOME_HERO_MODES.ATTRACTIONS ? (
+            <p className="home-hero__lead">
+              {activeHeroMode === HOME_HERO_MODES.ATTRACTIONS
+                ? '快速找到熱門景點可停車的位置'
+                : '快速找到附近可停車的位置'}
+            </p>
+            {activeHeroMode === HOME_HERO_MODES.ATTRACTIONS && (
               <div aria-label="台中熱門景點" className="home-hero__landmarks">
                 {TEST_LANDMARKS.map((landmark) => (
                   <Button
@@ -197,10 +202,6 @@ const HomePage = () => {
                   </Button>
                 ))}
               </div>
-            ) : (
-              <p className="home-hero__lead">
-                快速找到附近可停車的位置
-              </p>
             )}
             <div aria-label="首頁搜尋模式" className="home-hero__mode-switcher">
               <Button

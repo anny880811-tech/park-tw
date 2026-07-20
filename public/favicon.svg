@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="台中好停">
+  <rect width="64" height="64" rx="14" fill="#A7D5D9"/>
+  <text
+    x="32"
+    y="32"
+    fill="#2F3E46"
+    font-family="Noto Sans TC, Microsoft JhengHei, PingFang TC, sans-serif"
+    font-size="34"
+    font-weight="700"
+    dominant-baseline="central"
+    text-anchor="middle"
+  >停</text>
+</svg>

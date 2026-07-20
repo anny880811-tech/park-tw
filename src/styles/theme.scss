@@ -333,7 +333,7 @@ small,
 }
 
 .home-hero__landmarks {
-  grid-area: lead;
+  grid-area: landmarks;
 }
 
 .home-hero__mode-switcher .btn,
@@ -350,6 +350,12 @@ small,
     grid-template-columns: max-content max-content 1fr;
     align-items: center;
     gap: 1rem;
+  }
+
+  .home-hero__layout--attractions {
+    grid-template-areas:
+      "lead landmarks mode"
+      "map map map";
   }
 
   .home-hero__lead {
@@ -791,6 +797,127 @@ small,
   padding: 0.55rem 0.9rem;
 }
 
+.parking-district-filter {
+  display: grid;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.parking-district-filter__button {
+  justify-self: start;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+}
+
+.parking-district-filter__status {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.parking-district-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.parking-district-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(25, 39, 52, 0.48);
+}
+
+.parking-district-modal__dialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, 42rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  background: var(--color-surface);
+  border: 1px solid rgba(91, 124, 153, 0.16);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.parking-district-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(91, 124, 153, 0.1);
+}
+
+.parking-district-modal__header h2 {
+  margin-bottom: 0;
+  font-size: 1.2rem;
+}
+
+.parking-district-modal__close {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(91, 124, 153, 0.2);
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  color: var(--color-text);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.parking-district-modal__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.parking-district-modal__group {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.parking-district-modal__group h3 {
+  margin-bottom: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.parking-district-modal__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.parking-district-modal__option {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(91, 124, 153, 0.24);
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.parking-district-modal__option:hover,
+.parking-district-modal__option:focus,
+.parking-district-modal__option.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text);
+}
+
+.parking-district-modal__option--all {
+  justify-self: start;
+}
+
 .parking-landmark-shortcuts {
   gap: 0.5rem;
 }
@@ -1085,6 +1212,7 @@ small,
   .home-hero__layout--attractions {
     grid-template-areas:
       "mode"
+      "lead"
       "map"
       "button";
   }
@@ -1139,6 +1267,10 @@ small,
     padding: 0.55rem 0.75rem;
   }
 
+  .parking-district-filter__button {
+    width: 100%;
+  }
+
   .parking-search-panel__clear {
     width: 100%;
   }
@@ -1179,6 +1311,11 @@ small,
     gap: 0.35rem !important;
   }
 
+  .vehicle-type-filter {
+    gap: 0.35rem !important;
+  }
+
+  .vehicle-type-filter .btn,
   .parking-landmark-shortcuts .btn {
     min-height: 2.15rem;
     padding: 0.4rem 0.55rem;
@@ -1299,6 +1436,33 @@ small,
     overflow-wrap: anywhere;
   }
 
+  .parking-district-filter {
+    gap: 0.3rem;
+  }
+
+  .parking-district-filter__button {
+    min-height: 2.25rem;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.85rem;
+  }
+
+  .parking-district-modal {
+    padding: 0.5rem;
+  }
+
+  .parking-district-modal__header,
+  .parking-district-modal__body {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .parking-district-modal__option {
+    flex: 1 1 calc(50% - 0.5rem);
+    padding: 0.4rem 0.55rem;
+    font-size: 0.85rem;
+  }
+
+  .vehicle-type-filter .btn,
   .parking-landmark-shortcuts .btn {
     max-width: 100%;
     padding: 0.35rem 0.45rem;
