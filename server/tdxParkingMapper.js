@@ -5,6 +5,38 @@ import {
 } from '../src/models/parkingModel.js'
 import { VEHICLE_FILTERS } from '../src/constants/vehicleTypes.js'
 
+const TAICHUNG_DISTRICTS = [
+  '中區',
+  '東區',
+  '南區',
+  '西區',
+  '北區',
+  '西屯區',
+  '南屯區',
+  '北屯區',
+  '豐原區',
+  '潭子區',
+  '大雅區',
+  '神岡區',
+  '后里區',
+  '東勢區',
+  '石岡區',
+  '新社區',
+  '和平區',
+  '沙鹿區',
+  '清水區',
+  '梧棲區',
+  '龍井區',
+  '大肚區',
+  '大甲區',
+  '外埔區',
+  '大安區',
+  '大里區',
+  '太平區',
+  '烏日區',
+  '霧峰區',
+]
+
 const getLocalizedText = (value) => {
   if (typeof value === 'string') {
     return value
@@ -19,6 +51,26 @@ const getLocalizedText = (value) => {
 
 const getFirstValue = (...values) => {
   return values.find((value) => value !== undefined && value !== null && value !== '')
+}
+
+const normalizeDistrictName = (value = '') => {
+  if (typeof value !== 'string') {
+    return ''
+  }
+
+  const normalizedValue = value.trim()
+
+  if (!normalizedValue) {
+    return ''
+  }
+
+  return TAICHUNG_DISTRICTS.find((district) => normalizedValue.includes(district)) || ''
+}
+
+const getDistrictFromText = (...values) => {
+  return values.reduce((matchedDistrict, value) => {
+    return matchedDistrict || normalizeDistrictName(value)
+  }, '')
 }
 
 const toNumberOrNull = (value) => {
@@ -238,6 +290,13 @@ export const normalizeTdxParkingLot = (rawItem = {}) => {
   const position = rawItem.CarParkPosition || rawItem.Position || {}
   const totalSpaces = toNumberOrNull(rawItem.TotalSpaces)
     ?? getParkingSpacesTotal(rawItem.ParkingSpaces)
+  const district = getDistrictFromText(
+    rawItem.TownName,
+    rawItem.Town,
+    rawItem.District,
+    rawItem.Address,
+    getLocalizedText(rawItem.CarParkName),
+  )
 
   return {
     id: rawItem.CarParkID || '',
@@ -249,7 +308,7 @@ export const normalizeTdxParkingLot = (rawItem = {}) => {
     totalSpacesByVehicleType: {},
     city: rawItem.City || '',
     cityCode: rawItem.CityCode || rawItem.AuthorityCode || '',
-    district: '',
+    district,
     address: rawItem.Address || '',
     latitude: toNumberOrNull(position.PositionLat),
     longitude: toNumberOrNull(position.PositionLon),
